@@ -1,0 +1,4 @@
+  File "a.py", line 5
+    categories = ['alt.atheism', 'talk.religion.misc','comp.graphics', 'sci.space']
+             ^
+SyntaxError: invalid syntax

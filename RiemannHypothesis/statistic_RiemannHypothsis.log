@@ -1,0 +1,52 @@
+column:3	total:1000	RP:274	prob:0.274	zeta(s):3.6496350365	numLimit:1000
+column:3	total:1000	RP:308	prob:0.308	zeta(s):3.24675324675	numLimit:1000
+column:3	total:1000	RP:291	prob:0.291	zeta(s):3.43642611684	numLimit:1000
+column:3	total:1000	RP:276	prob:0.276	zeta(s):3.6231884058	numLimit:1000
+column:3	total:1000	RP:293	prob:0.293	zeta(s):3.41296928328	numLimit:1000
+column:3	total:10000	RP:2869	prob:0.2869	zeta(s):3.48553502963	numLimit:1000
+column:3	total:10000	RP:2861	prob:0.2861	zeta(s):3.49528137015	numLimit:1000
+column:3	total:10000	RP:2783	prob:0.2783	zeta(s):3.59324469996	numLimit:1000
+column:3	total:10000	RP:2879	prob:0.2879	zeta(s):3.47342827371	numLimit:1000
+column:3	total:10000	RP:2849	prob:0.2849	zeta(s):3.51000351	numLimit:1000
+column:3	total:1000	RP:286	prob:0.286	zeta(s):3.4965034965	numLimit:10000
+column:3	total:1000	RP:271	prob:0.271	zeta(s):3.69003690037	numLimit:10000
+column:3	total:10	RP:5	prob:0.5	zeta(s):2.0	numLimit:100000
+column:3	total:100000	RP:28456	prob:0.28456	zeta(s):3.51419735732	numLimit:1000
+column:3	total:100000	RP:28725	prob:0.28725	zeta(s):3.48128807659	numLimit:1000
+column:3	total:10000	RP:2862	prob:0.2862	zeta(s):3.49406009783	numLimit:100	time:2.08401799202
+column:3	total:10000	RP:2897	prob:0.2897	zeta(s):3.451846738	numLimit:200	time:3.68493580818
+column:3	total:10000	RP:2861	prob:0.2861	zeta(s):3.49528137015	numLimit:500	time:11.929224968
+column:3	total:10000	RP:2814	prob:0.2814	zeta(s):3.55366027008	numLimit:1000	time:40.3653709888
+column:2	total:1000	RP:623	prob:0.623	zeta(s):1.6051364366	numLimit:1000	time:6.03781700134
+column:2	total:1000	RP:592	prob:0.592	zeta(s):1.68918918919	numLimit:1000	time:6.48891210556
+column:2	total:1000	RP:599	prob:0.599	zeta(s):1.6694490818	numLimit:1000	time:6.35567808151
+column:2	total:1000	RP:623	prob:0.623	zeta(s):1.6051364366	numLimit:1000	time:6.02352190018
+column:2	total:1000	RP:614	prob:0.614	zeta(s):1.62866449511	numLimit:1000	time:5.7913441658
+column:2	total:1000	RP:631	prob:0.631	zeta(s):1.58478605388	numLimit:1000	time:6.15885686874
+column:2	total:1000	RP:630	prob:0.63	zeta(s):1.5873015873	numLimit:1000	time:5.85549902916
+column:2	total:1000	RP:605	prob:0.605	zeta(s):1.65289256198	numLimit:1000	time:6.49345302582
+column:2	total:1000	RP:584	prob:0.584	zeta(s):1.71232876712	numLimit:1000	time:7.57072520256
+column:2	total:1000	RP:595	prob:0.595	zeta(s):1.68067226891	numLimit:1000	time:7.91759705544
+column:2	total:1000	RP:599	prob:0.599	zeta(s):1.6694490818	numLimit:10000	time:334.620313883
+column:2	total:1000	RP:636	prob:0.636	zeta(s):1.57232704403	numLimit:10000	time:280.858175039
+column:2	total:1000	RP:615	prob:0.615	zeta(s):1.62601626016	numLimit:10000	time:278.905476093
+column:2	total:1000	RP:594	prob:0.594	zeta(s):1.6835016835	numLimit:10000	time:286.134238958
+column:2	total:1000	RP:629	prob:0.629	zeta(s):1.58982511924	numLimit:10000	time:328.102683067
+column:2	total:1000	RP:580	prob:0.58	zeta(s):1.72413793103	numLimit:10000	time:290.761011124
+column:2	total:1000	RP:609	prob:0.609	zeta(s):1.64203612479	numLimit:10000	time:288.268762112
+column:2	total:1000	RP:620	prob:0.62	zeta(s):1.61290322581	numLimit:10000	time:270.313132048
+column:2	total:1000	RP:621	prob:0.621	zeta(s):1.61030595813	numLimit:10000	time:293.056349039
+column:2	total:1000	RP:562	prob:0.562	zeta(s):1.7793594306	numLimit:10000	time:287.778635025
+column:2	total:100	RP:58	prob:0.58	zeta(s):1.72413793103	numLimit:100000	time:3200.84253788
+column:2	total:100	RP:58	prob:0.58	zeta(s):1.72413793103	numLimit:100000	time:3202.82487011
+column:2	total:100	RP:58	prob:0.58	zeta(s):1.72413793103	numLimit:100000	time:2975.95371604
+column:2	total:100	RP:68	prob:0.68	zeta(s):1.47058823529	numLimit:100000	time:2829.20324588
+column:2	total:100	RP:64	prob:0.64	zeta(s):1.5625	numLimit:100000	time:2633.34716392
+column:2	total:100	RP:56	prob:0.56	zeta(s):1.78571428571	numLimit:100000	time:3163.83761907
+column:2	total:100	RP:60	prob:0.6	zeta(s):1.66666666667	numLimit:100000	time:2991.46373487
+column:2	total:100	RP:56	prob:0.56	zeta(s):1.78571428571	numLimit:100000	time:2826.97696519
+column:2	total:100	RP:56	prob:0.56	zeta(s):1.78571428571	numLimit:100000	time:2884.34329391
+column:2	total:100	RP:63	prob:0.63	zeta(s):1.5873015873	numLimit:100000	time:2825.18229604
+column:4	total:100	RP:13	prob:0.13	zeta(s):7.69230769231	numLimit:100000	time:6783.1030941
+column:4	total:100	RP:11	prob:0.11	zeta(s):9.09090909091	numLimit:100000	time:3644.62557101
+column:4	total:100	RP:13	prob:0.13	zeta(s):7.69230769231	numLimit:100000	time:3599.83904696

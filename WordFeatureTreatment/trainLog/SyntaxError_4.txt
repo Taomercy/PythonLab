@@ -1,0 +1,4 @@
+  File "b.py", line 3
+    
+                         ^
+SyntaxError: invalid syntax

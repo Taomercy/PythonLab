@@ -1,0 +1,4 @@
+  File "a.py", line 7
+    vectorizer = TfidfVectorizer()
+             ^
+SyntaxError: invalid syntax

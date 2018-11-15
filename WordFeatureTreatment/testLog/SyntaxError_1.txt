@@ -1,0 +1,4 @@
+  File "a.py", line 5
+    from sklearn.feature_extraction.text import TfidfVectorizer
+       ^
+SyntaxError: invalid syntax
