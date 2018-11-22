@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import division
-from sympy import *
+from sympy import symbols, simplify, integrate, limit, oo
 x, n = symbols('x, n')
 f = x/(1+x)
 print "f1 =", f
