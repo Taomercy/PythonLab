@@ -48,6 +48,7 @@ pip_install_model sklearn
 apt_install_model Image python-imaging
 apt_install_model yaml python-yaml
 pip_install_model ruamel.yaml
+apt_install_model Tkinter python-tk
 
 #model about excel
 pip_install_model xlrd
