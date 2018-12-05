@@ -37,20 +37,24 @@ fi
 pip_install_model pandas
 pip_install_model requests
 
-#model about data processing
+#model data processing
 pip_install_model numpy
 pip_install_model scipy
 pip_install_model matplotlib
 pip_install_model sympy
 pip_install_model sklearn
 
-
+#model image processing
 apt_install_model Image python-imaging
-apt_install_model yaml python-yaml
-pip_install_model ruamel.yaml
 apt_install_model Tkinter python-tk
 
-#model about excel
+#model yaml
+apt_install_model yaml python-yaml
+pip_install_model ruamel.yaml
+
+#model excel
 pip_install_model xlrd
 pip_install_model xlwt
 
+#model mysql
+pip_install_model MySQLdb MySQL-python
