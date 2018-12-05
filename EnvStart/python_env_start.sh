@@ -6,10 +6,11 @@ function pip_install_model(){
     if [ -z $package_name ];then
         package_name=$model_name
     fi
-    python -c "import $model_name"
+    python -c "import $model_name" 2>/dev/null
     if [ $? != 0 ];then
         sudo pip install $package_name
     fi
+    if [ $? != 0 ];then exit $?;fi
 }
 
 function apt_install_model(){
@@ -18,20 +19,24 @@ function apt_install_model(){
     if [ -z $package_name ];then
         package_name=$model_name
     fi
-    python -c "import $model_name"
+    python -c "import $model_name" 2>/dev/null
     if [ $? != 0 ];then
-        sudo apt-get install $package_name
+        sudo apt-get install $package_name -y
     fi
+    if [ $? != 0 ];then exit $?;fi
 }
 
 python --version
 if [ $? != 0 ];then exit 0; fi
 
-pip --version > /dev/null
+pip --version  1>/dev/null
 if [ $? == 127 ];then
-    sudo apt-get install python-pip
+    sudo apt-get install python-pip python-dev build-essential -y
+    sudo apt-get install uwsgi uwsgi-plugin-python -y
+    sudo apt-get install uwsgi-plugin-python3 -y
     sudo pip install --upgrade pip
 fi
+if [ $? != 0 ];then exit $?;fi
 
 #model common
 pip_install_model pandas

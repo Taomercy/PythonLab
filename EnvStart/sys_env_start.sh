@@ -3,10 +3,10 @@
 #dos2unix $0
 
 #install vim
-vim --version 1>/dev/null 2>/dev/null
+vim --help 1>/dev/null 2>/dev/null
 if [ $? == 127 ];then
-    sudo apt-get remove vim-common
-    sudo apt-get install vim
+    sudo apt-get remove vim-common -y
+    sudo apt-get install vim -y
     echo "set nu" > ~/.vimrc
     echo "set ts=4" >> ~/.vimrc
     echo "set expandtab" >> ~/.vimrc
@@ -14,23 +14,30 @@ fi
 if [ $? != 0 ];then exit $?;fi
 
 #install git
-git --version 1>/dev/null 2>/dev/null
+git --help 1>/dev/null 2>/dev/null
 if [ $? == 127 ];then
-    sudo apt install git
+    sudo apt install git -y
+fi
+if [ $? != 0 ];then exit $?;fi
+
+#install curl
+curl --help 1>/dev/null 2>/dev/null
+if [ $? == 127 ];then
+    sudo apt install curl -y
 fi
 if [ $? != 0 ];then exit $?;fi
 
 #install rar 
 rar -v 1>/dev/null 2>/dev/null
 if [ $? == 127 ];then
-    sudo apt-get install rar
+    sudo apt-get install rar -y
 fi
 if [ $? != 0 ];then exit $?;fi
 
 #install tmux
 tmux -h 2>/dev/null
 if [ $? == 127 ];then
-    sudo apt-get install tmux
+    sudo apt-get install tmux -y
 fi
 if [ $? != 0 ];then exit $?;fi
 
@@ -38,9 +45,9 @@ if [ $? != 0 ];then exit $?;fi
 #tips:when installing need config root password
 mysql 2>/dev/null
 if [ $? == 127 ];then
-    sudo apt-get install mysql-server
-    sudo apt-get isntall mysql-client
-    sudo apt-get install libmysqlclient-dev
+    sudo apt-get install mysql-server -y
+    sudo apt-get isntall mysql-client -y
+    sudo apt-get install libmysqlclient-dev -y
     sudo netstat -tap | grep mysql
     sed 's/^bind-address/#&/g' /etc/mysql/mysql.conf.d/mysqld.cnf
     #then config your account into mysql by the command "mysql -u root -p"
@@ -52,3 +59,6 @@ if [ $? == 127 ];then
     #service mysql restart
 fi
 if [ $? != 0 ];then exit $?;fi
+
+sudo apt-get upgrade -y
+#sudo reboot
