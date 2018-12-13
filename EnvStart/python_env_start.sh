@@ -32,7 +32,9 @@ if [ $? != 0 ];then exit 0; fi
 pip --version  1>/dev/null
 if [ $? == 127 ];then
     sudo apt-get install python-pip python-dev build-essential -y
-    sudo apt-get install uwsgi uwsgi-plugin-python -y
+    sudo apt-get install libsasl2-dev -y
+    sudo apt-get install libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev -y
+    sudo apt-get install uwsgi-uwsgi-plugin-python -y
     sudo apt-get install uwsgi-plugin-python3 -y
     sudo pip install --upgrade pip
 fi
@@ -41,6 +43,8 @@ if [ $? != 0 ];then exit $?;fi
 #model common
 pip_install_model pandas
 pip_install_model requests
+pip_install_model bs4
+apt_install_model Django python-django
 
 #model data processing
 pip_install_model numpy

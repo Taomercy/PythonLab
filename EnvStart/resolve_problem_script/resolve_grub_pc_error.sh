@@ -1,4 +1,8 @@
-cd /var/lib/dpkg
-sudo mv info info.bak
-sudo mkdir info
-sudo apt-get install shotwell
+#/bin/bash -x
+sudo mv /var/lib/dpkg/info /var/lib/dpkg/info_old
+sudo mkdir /var/lib/dpkg/info
+sudo apt-get update
+sudo apt-get -f install
+sudo mv /var/lib/dpkg/info/* /var/lib/dpkg/info_old
+sudo rm -rf /var/lib/dpkg/info
+sudo mv /var/lib/dpkg/info_old /var/lib/dpkg/info
