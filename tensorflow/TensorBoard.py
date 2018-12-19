@@ -49,8 +49,7 @@ for i in range(10000):
     # 收集每次训练产生的数据
     writer.add_summary(summary, i)
 
-curr_W, curr_b, curr_loss = sess.run(
-    [W, b, loss], {x: x_train, y: y_train})
+curr_W, curr_b, curr_loss = sess.run([W, b, loss], {x: x_train, y: y_train})
 
 print("After train W: %s b %s loss: %s" % (curr_W, curr_b, curr_loss))
 

@@ -23,6 +23,7 @@ def main():
         cross_entropy = -1*tf.reduce_sum(y_*tf.log(y))
         tf.summary.scalar("cross-entropy", cross_entropy)
 
+    #for tensor board
     merged = tf.summary.merge_all()
     writer = tf.summary.FileWriter('/tmp/tensorflow', sess.graph)
 
