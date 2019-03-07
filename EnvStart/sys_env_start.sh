@@ -60,5 +60,17 @@ if [ $? == 127 ];then
 fi
 if [ $? != 0 ];then exit $?;fi
 
+#install python3.7.1
+sudo apt-get install -y zlib*
+wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1rc2.tgz
+tar -zcvf Python-3.7.1rc2.tgz
+mkdir -p /usr/local/python3
+pushd Python-3.7.1rc2
+./configure  --with-ssl --prefix=/usr/local/python3
+make && make install
+popd
+rm -rf Python-3.7.1rc2*
+
+
 sudo apt-get upgrade -y
 #sudo reboot

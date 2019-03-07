@@ -30,7 +30,7 @@ python --version
 if [ $? != 0 ];then exit 0; fi
 
 pip --version  1>/dev/null
-if [ $? == 127 ];then
+if [ $? != 0 ];then
     sudo apt-get install python-pip python-dev build-essential -y
     sudo apt-get install libsasl2-dev -y
     sudo apt-get install libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev -y
@@ -52,6 +52,8 @@ pip_install_model scipy
 pip_install_model matplotlib
 pip_install_model sympy
 pip_install_model sklearn
+pip_install_model torch
+pip_install_model torchvision
 
 #model image processing
 apt_install_model Image python-imaging
