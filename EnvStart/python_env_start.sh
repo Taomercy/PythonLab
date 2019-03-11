@@ -33,7 +33,7 @@ pip --version  1>/dev/null
 if [ $? != 0 ];then
     sudo apt-get install python-pip python-dev build-essential -y
     sudo apt-get install libsasl2-dev -y
-    sudo apt-get install libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev -y
+    sudo apt-get install libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev libldap2-dev -y
     sudo apt-get install uwsgi-uwsgi-plugin-python -y
     sudo apt-get install uwsgi-plugin-python3 -y
     sudo pip install --upgrade pip
