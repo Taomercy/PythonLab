@@ -13,6 +13,9 @@ if [ $? == 127 ];then
 fi
 if [ $? != 0 ];then exit $?;fi
 
+apt-get autoremove open-vm-tools
+sudo apt-get install open-vm-tools-desktop
+
 #install git
 git --help 1>/dev/null 2>/dev/null
 if [ $? == 127 ];then

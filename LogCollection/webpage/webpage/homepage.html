@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LogCollection</title>
+</head>
+<body>
+<h1 style="...">用户输入</h1>
+<form action="{% url 'webpage:get_jenkins_log' %}" method="post">
+    <input type="text" name="log_url"/>
+    <input type="submit" name="提交"/>
+</form>
+</body>
+</html>

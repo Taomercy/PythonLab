@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Info</title>
+    <link rel="stylesheet" href="https://static.djangoproject.com/css/output.beb34528fd55.css" >
+</head>
+<body>
+    <h2 style="...">UpLoad Log</h2>
+    <a  href="{% url 'InfoFillInPage:CleanAll' %}">Clean All</a>
+    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
+    <br>
+    <a  href="{% url 'InfoFillInPage:UploadLog' %}">Go to upload log</a>
+
+    <h2>Log Display</h2>
+    <div>
+        <table border="1">
+        <thead>
+            <tr>
+                {% for th in theader %}
+                    <th>
+                        <strong>{{ th }}</strong>
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td class="col-sm-2">{{ log.log_name }}</td>
+                    <td class="col-sm-2">{{ log.team|default_if_none:'' }}</td>
+                    <td class="col-sm-2">{{ log.error_type }}</td>
+                    <td class="col-sm-2">{{ log.description|default_if_none:'' }}</td>
+                    <td class="col-sm-2">{{ log.upload_time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+</body>
+</html>

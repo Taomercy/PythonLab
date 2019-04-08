@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UploadLog</title>
+    <link rel="stylesheet" href="https://static.djangoproject.com/css/output.beb34528fd55.css" >
+</head>
+<body>
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="{% url 'LogDisplay' %}" class="navbar-text"><strong>Log Display</strong></a>
+    </div>
+
+    <form action="{% url 'InfoFillInPage:UploadLogHander' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="logfile">
+        <p>Team</p>
+        <label>Choose the team
+            <select name="team">
+            {% for team in Teams %}
+                <option id="team" value="{{team.name}}">{{team.name}}</option>
+            {% endfor %}
+            </select>
+        </label>
+        <br>
+        <p>Error Type</p>
+        <label>Choose the error type
+            <select name="error_type">
+            {% for error in ErrorTypes %}
+                <option id="error" value="{{error.error_type}}">{{error.error_type}}</option>
+            {% endfor %}
+            </select>
+        </label>
+        <br>
+        <p>Description</p>
+        <input type="text" name="description"/>
+        <br>
+        <input type="submit" value="上传">
+    </form>
+    <a href="{% url 'InfoFillInPage:CreateErrorType' %}" class="navbar-text"><strong>Create new error type</strong></a>
+    <br>
+    <a href="{% url 'InfoFillInPage:CreateTeam' %}" class="navbar-text"><strong>Create new team</strong></a>
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+
+    <h2 style="...">UpLoad Log</h2>
+    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
+</body>
+</html>
