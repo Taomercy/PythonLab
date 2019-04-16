@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^LogDisplay/', views.LogDisplay, name='LogDisplay'),
     url(r'^LogCollection/', include('webpage.urls', namespace='InfoFillInPage')),
+    url(r'^LogAnalysisPage/', include('LogAnalysis.urls', namespace='LogAnalysisPage')),
 ]

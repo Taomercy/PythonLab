@@ -6,6 +6,17 @@
     <link rel="stylesheet" href="https://static.djangoproject.com/css/output.beb34528fd55.css" >
 </head>
 <body>
+    <a href="{% url 'LogDisplay' %}" class="navbar-text"><strong>Log Display</strong></a>
+    <h2 style="...">UpLoad Log</h2>
+    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
+    <br>
+    <a  href="{% url 'InfoFillInPage:UploadLog' %}">Go to upload log</a>
+    <br>
+    <a  href="{% url 'InfoFillInPage:BatchCollectionLog' %}">Go to Batch Collection logs</a>
+    <br>
+    <a  href="{% url 'LogAnalysisPage:LogAnalysisPage' %}">Go to log analysis</a>
+    <br>
+
     <h2>Team Display</h2>
     <div>
         <table border="1">

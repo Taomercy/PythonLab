@@ -25,7 +25,7 @@ SECRET_KEY = '!ar*qi=1tccs8%yogpc4gr(r96s+hxwglh%o$%nl$)j1_!5j!8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'webpage',
     'LogCollection',
+    'LogAnalysis',
 ]
 
 MIDDLEWARE = [

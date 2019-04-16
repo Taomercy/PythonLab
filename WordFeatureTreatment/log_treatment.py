@@ -58,7 +58,9 @@ def cross_validation():
 
     predicted = clf.predict(X_new_tfidf)
     print predicted
-    print metrics.classification_report(y_test, predicted)
+    res = metrics.classification_report(y_test, predicted)
+    print res
+    return res
 
 def main():
     logContexts, logLabels = trainning_log_data_set('trainLog')
@@ -84,5 +86,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    #cross_validation()
+    #main()
+    cross_validation()

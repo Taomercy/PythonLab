@@ -6,14 +6,14 @@
     <link rel="stylesheet" href="https://static.djangoproject.com/css/output.beb34528fd55.css" >
 </head>
 <body>
-    <div class="navbar-header">
-        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a href="{% url 'LogDisplay' %}" class="navbar-text"><strong>Log Display</strong></a>
-    </div>
+    <a href="{% url 'LogDisplay' %}" class="navbar-text"><strong>Log Display</strong></a>
+    <h2 style="...">UpLoad Log</h2>
+    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
+    <br>
+    <a  href="{% url 'InfoFillInPage:BatchCollectionLog' %}">Go to Batch Collection logs</a>
+    <br>
+    <a  href="{% url 'LogAnalysisPage:LogAnalysisPage' %}">Go to log analysis</a>
+    <br>
 
     <form action="{% url 'InfoFillInPage:UploadLogHander' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -39,7 +39,7 @@
         <p>Description</p>
         <input type="text" name="description"/>
         <br>
-        <input type="submit" value="上传">
+        <input type="submit" value="submit">
     </form>
     <a href="{% url 'InfoFillInPage:CreateErrorType' %}" class="navbar-text"><strong>Create new error type</strong></a>
     <br>
@@ -53,8 +53,5 @@
         </script>
     {% endif %}
 
-
-    <h2 style="...">UpLoad Log</h2>
-    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
 </body>
 </html>

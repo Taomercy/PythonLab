@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<head>
+    <meta charset="UTF-8">
+    <title>Batch Collection Log</title>
+    <link rel="stylesheet" href="https://static.djangoproject.com/css/output.beb34528fd55.css" >
+</head>
+</head>
+
+<body>
+    <a href="{% url 'LogDisplay' %}" class="navbar-text"><strong>Log Display</strong></a>
+    <h2 style="...">LogAnalysisPage</h2>
+    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
+    <br>
+    <a  href="{% url 'InfoFillInPage:UploadLog' %}">Go to upload log</a>
+    <br>
+    <a  href="{% url 'InfoFillInPage:BatchCollectionLog' %}">Go to Batch Collection logs</a>
+    <br>
+    <a  href="{% url 'LogAnalysisPage:LogAnalysisPage' %}">Go to log analysis</a>
+    <br>
+
+    <form action="{% url 'LogAnalysisPage:TrainingLogByNaiveBayes' %}" method="post" enctype="multipart/form-data">
+        <p>input training dir</p>
+        <input type="text" name="training_dir">
+        <input type="submit" value="submit">
+    </form>
+
+    <p>train report</p>
+    <pre>{{ predicted }}</pre>
+    <pre>score = {{ metrics_score }}</pre>
+    <pre>{{ metrics_report }}</pre>
+</body>
+</html>

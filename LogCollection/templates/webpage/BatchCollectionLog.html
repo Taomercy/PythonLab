@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>LogCollection</title>
+    <title>Batch Collection Log</title>
     <link rel="stylesheet" href="https://static.djangoproject.com/css/output.beb34528fd55.css" >
 </head>
 <body>
     <a href="{% url 'LogDisplay' %}" class="navbar-text"><strong>Log Display</strong></a>
-    <h2 style="...">InfoFillInPage</h2>
-    <a  href="{% url 'InfoFillInPage:UploadLog' %}">Go to upload log</a>
+    <h2 style="...">BatchCollectionLog</h2>
+    <a  href="{% url 'InfoFillInPage:InfoFillInPage' %}">Go to Info fill page</a>
     <br>
-    <a  href="{% url 'InfoFillInPage:BatchCollectionLog' %}">Go to Batch Collection logs</a>
+    <a  href="{% url 'InfoFillInPage:UploadLog' %}">Go to upload log</a>
     <br>
     <a  href="{% url 'LogAnalysisPage:LogAnalysisPage' %}">Go to log analysis</a>
     <br>
@@ -18,7 +18,10 @@
     <h2 style="...">Input</h2>
     <form action="{% url 'InfoFillInPage:get_jenkins_log_by_build_num_internal' %}" method="post">
         <p>Jenkins Url</p>
-        <input type="text" name="log_url"/>
+        <input type="text" name="job_home_url"/>
+        <p>Build internal</p>
+        <input type="text" name="build_num_start" placeholder="build num start"/>
+        <input type="text" name="build_num_end" placeholder="build num end"/>
         <p>Team</p>
         <label>Choose the team
             <select name="team">
@@ -54,6 +57,11 @@
             {% endfor %}
         </script>
     {% endif %}
+
+</body>
+</html></title>
+</head>
+<body>
 
 </body>
 </html>

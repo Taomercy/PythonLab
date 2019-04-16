@@ -74,6 +74,12 @@ def InfoFillInPage(request):
     return render(request, 'webpage/InfoFillInPage.html', context=context)
 
 
+def BatchCollectionLog(request):
+    context = search_all_error_type()
+    context.update(search_all_teams())
+    return render(request, 'webpage/BatchCollectionLog.html', context=context)
+
+
 def UploadLog(request):
     context = search_all_error_type()
     context.update(search_all_teams())
@@ -138,12 +144,7 @@ def UploadLogHander(request):
             for c in log_file.chunks():
                 fw.write(c)
 
-        print "logfilename:", log_file.name
-        print "team:", team
-        print "description:", description
-        print "error_type:", error_type
-        print ErrorType.objects.all().get(error_type=error_type)
-        log = LogFile.objects.create(log_name=log_name,
+        log = LogFile.objects.create(log_name=log_file.name,
                                      team=Team.objects.all().get(name=team),
                                      description=description,
                                      error_type=ErrorType.objects.all().get(error_type=error_type))
@@ -160,6 +161,7 @@ def get_jenkins_log(request):
     if request.method == "POST":
         url = request.POST.get('log_url', None)
         team = request.POST.get('team', None)
+        error_type = request.POST.get('error_type', "")
         description = request.POST.get('description', "")
         job_url = JobUrlModel(url)
         team_path = os.path.join(LOG_SAVING_PATH, team, job_url.get_job_name())
@@ -167,11 +169,44 @@ def get_jenkins_log(request):
             os.makedirs(team_path)
         log_filename = job_url.save_console_text(team_path)
 
-        print "log_filename:", log_filename
-        print "team:", team
-        print "description:", description
-        log = LogFile.objects.create(log_name=log_filename, team=team, description=description)
+        log = LogFile.objects.create(log_name=os.path.basename(log_filename),
+                                     team=Team.objects.all().get(name=team),
+                                     description=description,
+                                     error_type=ErrorType.objects.all().get(error_type=error_type))
         log.save()
+        messages.success(request, "哈哈哈哈，上传成功啦!")
+
+    context = search_all_logs()
+    return render(request, 'webpage/LogDisplay.html', context=context)
+
+
+def get_jenkins_log_by_build_num_internal(request):
+    if request.method == "POST":
+        job_home_url = request.POST.get('job_home_url', None)
+        team = request.POST.get('team', None)
+        error_type = request.POST.get('error_type', "")
+        description = request.POST.get('description', "")
+        build_num_start = request.POST.get('build_num_start', 0)
+        build_num_end = request.POST.get('build_num_end', 1)
+        build_num_vector = [num for num in range(int(build_num_start), int(build_num_end))]
+        url_list = [job_home_url+str(build_num)+"/console" for build_num in build_num_vector]
+
+        for url in url_list:
+            try:
+                print "url:", url
+                job_url = JobUrlModel(url)
+                team_path = os.path.join(LOG_SAVING_PATH, team, job_url.get_job_name())
+                if not os.path.exists(team_path):
+                    os.makedirs(team_path)
+                log_filename = job_url.save_console_text(team_path)
+                log = LogFile.objects.create(log_name=os.path.basename(log_filename),
+                                             team=Team.objects.all().get(name=team),
+                                             description=description,
+                                             error_type=ErrorType.objects.all().get(error_type=error_type))
+                log.save()
+            except Exception as error:
+                print "log save error:", error
+                continue
         messages.success(request, "哈哈哈哈，上传成功啦!")
 
     context = search_all_logs()
