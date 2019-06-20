@@ -1,0 +1,60 @@
+{% extends "./../webpage/base.html" %}
+{% block content %}
+    <p>predict logs</p>
+    <div>
+        <table border="1">
+        <thead>
+            <tr>
+                <th>Log</th>
+                <th>Predict label</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in files %}
+                <tr>
+                    <td class="col-sm-2">{{ log }}</td>
+                    <td class="col-sm-2"></td>
+                    <td>
+                        <form method="post" action="{% url 'LogAnalysisPage:PreditLogDelete' %}">
+                            <input type="hidden" name="predict_log" value="{{ log }}">
+                            <input type="submit" name="submit" value="delete">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            {% for p in predicted %}
+                <tr>
+                    <td class="col-sm-2">{{ p.log }}</td>
+                    <td class="col-sm-2">{{ p.predict_label }}</td>
+                    <td>
+                        <form method="post" action="{% url 'LogAnalysisPage:PreditLogDelete' %}">
+                            <input type="hidden" name="predict_log" value="{{ p.log }}">
+                            <input type="submit" name="submit" value="delete">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+
+
+    <form action="{% url 'LogAnalysisPage:UploadPredictLog' %}" method="post">
+        <p>Jenkins Url</p>
+        <input type="text" name="job_home_url"/>
+        <p>Build internal</p>
+        <input type="text" name="build_num_start" placeholder="build num start"/>
+        <input type="text" name="build_num_end" placeholder="build num end"/>
+        <input type="submit" name="submit" value="UploadPredictLog"/>
+    </form>
+
+    <form action="{% url 'LogAnalysisPage:PredictByMLP' %}" method="post">
+        <input type="submit" name="predict" value="PredictByMLP"/>
+    </form>
+
+    <form action="{% url 'LogAnalysisPage:PredictByBayes' %}" method="post">
+        <input type="submit" name="predict" value="PredictByBayes"/>
+    </form>
+{% endblock %}

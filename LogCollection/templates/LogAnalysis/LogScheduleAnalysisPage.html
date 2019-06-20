@@ -1,0 +1,53 @@
+{% extends "./../webpage/base.html" %}
+{% block content %}
+    <h2 class="text-center">Schedule training report</h2>
+    <div class="search panel panel-default" style="margin-bottom: 0">
+        <div class="panel-body form-group" style="margin-bottom:0">
+            <form class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:ScoresStatistic' %}" method="post">
+                <div class="form-group">
+                    <label for="team" class="col-sm-2 control-label">Job Name</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" name="training_job">
+                            {% for job in training_jobs %}
+                                <option id="job_name" value="{{job.name}}">{{job.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="team" class="col-sm-2 control-label">Training model</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" name="model">
+                            <option id="model" value="">All</option>
+                            {% for model in models %}
+                                {% for value in model.values %}
+                                    {% if value != 'K-means++' and value != 'K-means-DBSCAN' %}
+                                        <option id="model" value="{{ value }}">{{ value }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0">
+                    <div class="col-sm-offset-2 col-sm-9">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% load staticfiles %}
+
+    <div style="overflow: auto; margin:20px" >
+        {% for img in images %}
+            <img src="{% static img %}">
+            <br/>
+        {% endfor %}
+    </div>
+
+<br/><br/><br/>
+{% endblock %}
+

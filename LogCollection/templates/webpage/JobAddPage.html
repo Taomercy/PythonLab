@@ -1,0 +1,297 @@
+{% extends "./base.html" %}
+{% block content %}
+
+    <div class="addBody" style="width:100%; position: absolute;top:10px">
+         <div class="col-sm-12">
+             <div class="ibox float-e-margins">
+                 <h3 class="text-center">Add a new Job</h3>
+                 <div class="ibox-content">
+                     <form id="addForm" method="post" class="form-horizontal" action="{% url 'LogCollection:SaveNewJob' %}">
+                         <div class="form-group">
+                             <label class="col-sm-2 control-label">JobName</label>
+                             <div class="col-sm-10">
+                                 <input type="text" class="form-control" name="name" id="add_name"/>
+                             </div>
+                         </div>
+
+                         <div class="hr-line-dashed"></div>
+                         <div class="form-group">
+                             <label class="col-sm-2 control-label">JobUrl</label>
+                             <div class="col-sm-10">
+                                 <input type="text" class="form-control" name="url" id="add_url"/>
+                             </div>
+                         </div>
+                         <div class="hr-line-dashed" style="display:none"></div>
+                         <div class="form-group" style="display:none">
+                             <label class="col-sm-2 control-label">JobDirectory</label>
+                             <div class="col-sm-10">
+                                 <input type="text" class="form-control" name="job_dir" id="add_job_dir"/>
+                             </div>
+                         </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">JobIsmonitored</label>
+                            <div class="col-sm-10">
+                                 <select class="form-control" name="ismonitored">
+                                     <option id="error_type_editing">True</option>
+                                     <option id="error_type_editing">False</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">JobFetchSizeOfOneTime</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="fetchSizeOfOneTime" id="add_fetchSizeOfOneTime"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">FetchFrequency</label>
+                            <div class="col-sm-10 form-inline">
+                                <label class="col-sm-1">Hours:</label>
+                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_h" id="add_fetchFrequency_h"/>
+                                <label class="col-sm-1">Min:</label>
+                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_m" id="add_fetchFrequency_m"/>
+                                <label class="col-sm-1">Sec:</label>
+                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_s" id="add_fetchFrequency_s"/>
+                                <label class="col-sm-1">Result:</label>
+                                <input type="text" class="form-control" name="fetchFrequency" id="add_fetchFrequency"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">TrainingFrequency</label>
+                            <div class="col-sm-10 form-inline">
+                                <label class="col-sm-1">Hours:</label>
+                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_h" id="add_trainingFrequency_h"/>
+                                <label class="col-sm-1">Min:</label>
+                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_m" id="add_trainingFrequency_m"/>
+                                <label class="col-sm-1">Sec:</label>
+                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_s" id="add_trainingFrequency_s"/>
+                                <label class="col-sm-1">Result:</label>
+                                <input type="text" class="form-control" name="trainingFrequency" id="add_trainingFrequency"/>
+                            </div>
+{#                            <div class="col-sm-10">#}
+{#                                <input type="text" class="form-control" name="trainingFrequency" id="add_trainingFrequency"/>#}
+{#                            </div>#}
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">JobDescription</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="description" id="add_description"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-2 col-sm-offset-2">
+                                <button type="submit" class="btn btn-default btn-block">Save</button>
+{#                                <button type="button" class="btn btn-primary btn-block"  id="add_saveBtn">保存</button>#}
+                            </div>
+                            <div class="col-sm-2 col-sm-offset-1">
+                                <button type="button" class="btn btn-default btn-block"  id="add_backBtn">返回</button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+        </div>
+     </div>
+<br/><br/><br/><br/><br/><br/><br/><br/>
+{% endblock %}
+
+{% block script %}
+    $('#addForm').bootstrapValidator({
+        feedbackIcons: {
+               valid: 'glyphicon glyphicon-ok',
+               invalid: 'glyphicon glyphicon-remove',
+               validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            name: {
+                validators: {
+                    notEmpty: {
+                       message: 'Job name can not be empty'
+                    }
+                }
+            },
+            url: {
+                validators: {
+                    notEmpty: {
+                        message: 'URL can not be empty'
+                    },
+                    regexp: {
+                        regexp: /[a-zA-z]+:\/\/[^\s]*/,
+                        message: 'Please input job url like:https://fem101-eiffel012.lmera.ericsson.se:8443/jenkins/view/UDM-HSS/job/HSS_5G_amfsim/'
+                    }
+                }
+            },
+            'ismonitored[]': {
+                validators: {
+                    notEmpty: {
+                        message: 'Select one value'
+                    }
+                }
+            },
+            fetchSizeOfOneTime:{
+                validators:{
+                    notEmpty:{
+                        message:'Fetch log size can not be empty'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency: {
+                validators: {
+                    notEmpty:{
+                        message:'Fetch frequency result can not be empty'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    },
+{#                    greaterThan: {#}
+{#                        value: 10,#}
+{#                        message: '必须大于10'#}
+{#                    },#}
+                }
+            },
+            fetchFrequency_h: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency_m: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency_s: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency: {
+                validators: {
+                    notEmpty:{
+                        message:'Training frequency result can not be empty'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency_h: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency_m: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency_s: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            description: {
+                validators: {
+{#                    notEmpty:{#}
+{#                        message:'description can not be empty'#}
+{#                    },#}
+{#                    regexp: {#}
+{#                        regexp:/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/ ,#}
+{#                        message: '无效的邮箱'#}
+{#                    }#}
+                }
+            }
+        }
+    });
+//增加按钮事件
+    $('#add_backBtn').click(function(){
+         $(location).prop('href', '{% url 'LogCollection:SchedulerPage' %}')
+    })
+
+{#    $('#add_trainingFrequency').hunterTimePicker();#}
+
+    {# fetchFrequency vaules  calculate  #}
+    var H=0,M=0,S=0,H_t=0,M_t=0,S_t=0;
+    function resetTrainingFrequency(){
+        var x = getTrainingFrequency();
+        $("#add_trainingFrequency").val(x);
+    }
+
+    function resetFetchFrequency(){
+        var x = getFetchFrequency();
+        $("#add_fetchFrequency").val(x);
+    }
+    $("#add_fetchFrequency_h").change(function(){
+        h = $('#add_fetchFrequency_h').val();
+        H = h;
+        resetFetchFrequency();
+    });
+
+    $("#add_fetchFrequency_m").change(function(){
+        m = $('#add_fetchFrequency_m').val();
+        M = m;
+        resetFetchFrequency();
+    });
+
+    $("#add_fetchFrequency_s").change(function(){
+        s = $('#add_fetchFrequency_s').val();
+        S = s;
+        resetFetchFrequency();
+    });
+
+    $("#add_trainingFrequency_h").change(function(){
+        h = $('#add_trainingFrequency_h').val();
+        H_t = h;
+        resetTrainingFrequency();
+    });
+
+    $("#add_trainingFrequency_m").change(function(){
+        m = $('#add_trainingFrequency_m').val();
+        M_t = m;
+        resetTrainingFrequency();
+    });
+
+    $("#add_trainingFrequency_s").change(function(){
+        s = $('#add_trainingFrequency_s').val();
+        S_t = s;
+        resetTrainingFrequency();
+    });
+    function getTrainingFrequency(){
+        seconds = H_t*60*60 + M_t*60 + S_t * 1;
+        return seconds;
+    }
+    function getFetchFrequency(){
+        seconds = H*60*60 + M*60 + S * 1;
+        return seconds;
+    }
+
+{% endblock %}

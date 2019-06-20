@@ -1,0 +1,59 @@
+{% extends "./base.html" %}
+{% block content %}
+
+    <p class="text-center"><strong>Log information edit</strong></p>
+    <form class="form-horizontal" role="form" action="{% url 'LogCollection:LogEditSubmit' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="log_name_editing" class="col-sm-2 control-label">Log name</label>
+            <div class="col-sm-9">
+                <input type="hidden" name="log_name" value="{{ edit_log.name }}">
+                <input type="text" class="form-control" id="log_name_editing" name="log_name_editing" value="{{ edit_log.name }}" placeholder="Please input the new log name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="log_name_editing" class="col-sm-2 control-label">Team</label>
+            <div class="col-sm-9">
+                <p>Team = {{edit_log.team.name}}</p>
+                <select class="form-control" name="team_editing">
+                    {% comment %}<option id="error" value="">Select team</option>{% endcomment %}
+                    {% for team in Teams %}
+                        <option id="team" value="{{team.name}}">{{team.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="log_name_editing" class="col-sm-2 control-label">Error type</label>
+            <div class="col-sm-9">
+                <p>Error Type = {{edit_log.error_type.name}}</p>
+                <select class="form-control" name="error_type_editing">
+                 <!-- <option id="team" value="{{edit_log.error_type.name}}">{{edit_log.error_type.name}}</option> -->
+                {% for error in ErrorTypes %}
+                    <option id="error_type_editing" value="{{error.name}}">{{error.name}}</option>
+                {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description_editing" class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="description_editing" name="description_editing" value="{{ edit_log.description }}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </div>
+    </form>
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+{% endblock %}

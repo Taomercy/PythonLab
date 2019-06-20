@@ -1,0 +1,207 @@
+{% extends "./../webpage/base.html" %}
+{% block content %}
+
+    <style>
+        input[type=text]{
+            height: 33px;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
+    <p class="text-left"><strong>Select training method</strong></p>
+    <button id="btn_NativeBayes" class="btn btn-primary">NativeBayes</button>
+    <button id="btn_MLP" class="btn btn-primary">MLP&SVM</button>
+    <button id="btn_Kmeans" class="btn btn-primary">Kmeans</button>
+    {% comment %}<p class="text-center"><strong>Log analysis</strong></p>{% endcomment %}
+    <br/><br/>
+
+    <form id="NativeBayes" style="display: none" class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:TrainingLogByNaiveBayes' %}" method="post">
+        <div class="form-group">
+            <label for="team" class="col-sm-offset-2 col-sm-9">[data] Filter error & TFIDF [model] NativeBayes</label>
+            <label for="team" class="col-sm-2 control-label">Method NativeBayes</label>
+            <div class="col-sm-9">
+                <select class="form-control" name="training_job">
+                    {% for job in training_jobs %}
+                        <option id="dir" value="{{job.name}}">{{job.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-primary">training by Naive Bayes</button>
+            </div>
+        </div>
+    </form>
+
+    <form id="MLP" style="display: none" class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:TrainingLogBySVMAndMLP' %}" method="post">
+        <div class="form-group">
+            <label for="team" class="col-sm-offset-2 col-sm-9">[data] Doc2Vec [model] MLP&SVM</label>
+            <label for="team" class="col-sm-2 control-label">Method MLP&SVM</label>
+            <div class="col-sm-9">
+                <select class="form-control" name="training_job">
+                    {% for job in training_jobs %}
+                        <option id="dir" value="{{job.name}}">{{job.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-primary">Training by MLP&SVM</button>
+            </div>
+        </div>
+    </form>
+
+    <form id="Kmeans" style="display: none" class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:TrainingLogByKMeans' %}" method="post">
+        <div class="form-group">
+            <label for="team" class="col-sm-offset-2 col-sm-9">[data]  Doc2Vec [model] Kmeans</label>
+            <label for="team" class="col-sm-2 control-label">Method Kmeans</label>
+            <div class="col-sm-9">
+                <select class="form-control" name="training_job">
+                    {% for job in training_jobs %}
+                        <option id="dir" value="{{job.name}}">{{job.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="team" class="col-sm-2 control-label">Select sub method</label>
+            <div class="col-sm-9">
+                <select class="form-control" id="submodel" name="submodel">
+                    <option value="kmeans">k-means++</option>
+                    <option value="dbscan">DBSCAN</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" id="kmeans">
+            <div class="col-sm-offset-2 col-sm-9">
+                cluster_k <input type="text" name="cluster_k" placeholder="cluster k" value="3">
+                feature_d <input type="text" name="feature_d" placeholder="feature d" value="all">
+            </div>
+        </div>
+        <div class="form-group" style="display: none" id="dbscan">
+            <div class="col-sm-offset-2 col-sm-9">
+                eps <input type="text" name="eps" placeholder="eps" value="2">
+                min_samples <input type="text" name="min_samples" placeholder="min_samples" value="2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-primary">Training by Kmean</button>
+            </div>
+        </div>
+    </form>
+
+    {% load staticfiles %}
+    <div class="text-center">
+        {% for img in images %}
+            <img src="{% static img %}">
+        {% endfor %}
+    </div>
+
+    <div id="report">
+        <h2 class="text-center">train report</h2>
+
+        <div id="MLP_report">
+            <p>MLP</p>
+            <pre>{{ mlp_predicted }}</pre>
+            <pre>score = {{ mlp_metrics_score }}</pre>
+            <pre>{{ mlp_metrics_report }}</pre>
+        </div>
+
+        <div id="SVM_report">
+            <p>SVM</p>
+            <pre>{{ svm_predicted }}</pre>
+            <pre>score = {{ svm_metrics_score }}</pre>
+            <pre>{{ svm_metrics_report }}</pre>
+        </div>
+
+        <div id="NativeBayes_report">
+            <p>Naive bayes</p>
+            <pre>{{ predicted }}</pre>
+            <pre>score = {{ metrics_score }}</pre>
+            <pre>{{ metrics_report }}</pre>
+        </div>
+    </div>
+
+
+    <div>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    {% for th in label_th %}
+                        <th>
+                            <strong>{{ th }}</strong>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in km_result %}
+                    <tr>
+                    <td class="col-sm-2">{{ result.log }}</td>
+                    <td class="col-sm-2">{{ result.raw_label }}</td>
+                    <td class="col-sm-2">{{ result.km_label }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+
+    <script>
+        $(document).ready(function(){
+            $("#btn_MLP").click(function(){
+                $("#MLP").show();
+                $("#Kmeans").hide();
+                $("#NativeBayes").hide();
+                $("#report").show();
+                $("#MLP_report").show();
+                $("#SVM_report").show();
+                $("#NativeBayes_report").hide();
+            });
+            $("#btn_Kmeans").click(function(){
+                $("#MLP").hide();
+                $("#Kmeans").show();
+                $("#NativeBayes").hide();
+                $("#report").hide();
+            });
+            $("#btn_NativeBayes").click(function(){
+                $("#MLP").hide();
+                $("#Kmeans").hide();
+                $("#NativeBayes").show();
+                $("#report").show();
+                $("#MLP_report").hide();
+                $("#SVM_report").hide();
+                $("#NativeBayes_report").show();
+            });
+
+            $("#submodel").change(function(){
+                var v = $("#submodel").val();
+                if(v == "dbscan") {
+                    $("#kmeans").hide();
+                    $("#dbscan").show();
+                }else{
+                     $("#kmeans").show();
+                    $("#dbscan").hide();
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+

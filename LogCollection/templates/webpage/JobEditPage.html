@@ -1,0 +1,284 @@
+{% extends "./base.html" %}
+{% block content %}
+
+    <p class="text-center"><strong>Log information edit</strong></p>
+    <form id="editForm" class="form-horizontal" role="form" action="{% url 'LogCollection:JobEditSubmit' %}" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+             <label class="col-sm-2 control-label">JobName</label>
+             <div class="col-sm-10">
+                 <label>{{ edit_job.name }}</label>
+                 <input type="hidden" name="job_name" value="{{ edit_job.name }}"/>
+             </div>
+        </div>
+        <div class="form-group">
+             <label class="col-sm-2 control-label">JobUrl</label>
+             <div class="col-sm-10">
+                 <input type="text" class="form-control" name="url" value="{{ edit_job.url }}"/>
+             </div>
+        </div>
+
+             <div class="form-group" style="display:none">
+                 <label class="col-sm-2 control-label">JobDirectory</label>
+                 <div class="col-sm-10">
+                     <input type="text" class="form-control" name="job_dir" value="{{ edit_job.job_dir }}"/>
+                 </div>
+             </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">JobIsmonitored</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="ismonitored">
+                        <option id="error" value="{{edit_job.ismonitored}}">{{edit_job.ismonitored}}</option>
+                        {% if edit_job.ismonitored %}
+                            <option id="team">False</option>
+                        {% else %}
+                            <option id="team">True</option>
+                        {%  endif %}
+                    </select>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">JobFetchSizeOfOneTime</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="fetchSizeOfOneTime" value="{{ edit_job.fetchSizeOfOneTime }}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">FetchFrequency</label>
+                <div class="col-sm-10 form-inline">
+                    <label class="col-sm-1">Hours:</label>
+                    <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_h" id="add_fetchFrequency_h"/>
+                    <label class="col-sm-1">Min:</label>
+                    <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_m" id="add_fetchFrequency_m"/>
+                    <label class="col-sm-1">Sec:</label>
+                    <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_s" id="add_fetchFrequency_s"/>
+                    <label class="col-sm-1">Result:</label>
+{#                    <input type="text" class="form-control" name="fetchFrequency" id="add_fetchFrequency"/>#}
+                    <input type="text" class="form-control" name="fetchFrequency" id="add_fetchFrequency" value="{{ edit_job.fetchFrequency }}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">TrainingFrequency</label>
+                <div class="col-sm-10 form-inline">
+                    <label class="col-sm-1">Hours:</label>
+                    <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_h" id="add_trainingFrequency_h"/>
+                    <label class="col-sm-1">Min:</label>
+                    <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_m" id="add_trainingFrequency_m"/>
+                    <label class="col-sm-1">Sec:</label>
+                    <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_s" id="add_trainingFrequency_s"/>
+                    <label class="col-sm-1">Result:</label>
+{#                    <input type="text" class="form-control" name="trainingFrequency" id="add_trainingFrequency"/>#}
+                    <input type="text" class="form-control" name="trainingFrequency" id="add_trainingFrequency" value="{{ edit_job.trainingFrequency }}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">JobDescription</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="description" value="{{ edit_job.description }}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 col-sm-offset-2">
+                    <button type="submit" class="btn btn-default btn-block">Submit</button>
+                </div>
+                <div class="col-sm-2 col-sm-offset-1">
+                    <button type="button" class="btn btn-default btn-block"  id="edit_backBtn">Back</button>
+                </div>
+            </div>
+    </form>
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    $('#editForm').bootstrapValidator({
+        feedbackIcons: {
+               valid: 'glyphicon glyphicon-ok',
+               invalid: 'glyphicon glyphicon-remove',
+               validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            name: {
+                validators: {
+                    notEmpty: {
+                       message: 'Job name can not be empty'
+                    }
+                }
+            },
+            url: {
+                validators: {
+                    notEmpty: {
+                        message: 'URL can not be empty'
+                    },
+                    regexp: {
+                        regexp: /[a-zA-z]+:\/\/[^\s]*/,
+                        message: 'Please input job url like:https://fem101-eiffel012.lmera.ericsson.se:8443/jenkins/view/UDM-HSS/job/HSS_5G_amfsim/'
+                    }
+                }
+            },
+            'ismonitored[]': {
+                validators: {
+                    notEmpty: {
+                        message: 'Select one value'
+                    }
+                }
+            },
+            fetchSizeOfOneTime:{
+                validators:{
+                    notEmpty:{
+                        message:'Fetch log size can not be empty'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency: {
+                validators: {
+                    notEmpty:{
+                        message:'Fetch frequency result can not be empty'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency_h: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency_m: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            fetchFrequency_s: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency: {
+                validators: {
+                    notEmpty:{
+                        message:'Training frequency result can not be empty'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency_h: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency_m: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            trainingFrequency_s: {
+                validators: {
+                    regexp: {
+                        regexp: /^[1-9]\d*$/,
+                        message: 'Please input the integer number'
+                    }
+                }
+            },
+            description: {
+                validators: {
+                }
+            }
+        }
+    });
+//增加按钮事件
+    $('#edit_backBtn').click(function(){
+         $(location).prop('href', '{% url 'LogCollection:SchedulerPage' %}')
+    })
+
+    var H=0,M=0,S=0,H_t=0,M_t=0,S_t=0;
+    function resetTrainingFrequency(){
+        var x = getTrainingFrequency();
+        $("#add_trainingFrequency").val(x);
+    }
+
+    function resetFetchFrequency(){
+        var x = getFetchFrequency();
+        $("#add_fetchFrequency").val(x);
+    }
+    $("#add_fetchFrequency_h").change(function(){
+        h = $('#add_fetchFrequency_h').val();
+        H = h;
+        resetFetchFrequency();
+    });
+
+    $("#add_fetchFrequency_m").change(function(){
+        m = $('#add_fetchFrequency_m').val();
+        M = m;
+        resetFetchFrequency();
+    });
+
+    $("#add_fetchFrequency_s").change(function(){
+        s = $('#add_fetchFrequency_s').val();
+        S = s;
+        resetFetchFrequency();
+    });
+
+    $("#add_trainingFrequency_h").change(function(){
+        h = $('#add_trainingFrequency_h').val();
+        H_t = h;
+        resetTrainingFrequency();
+    });
+
+    $("#add_trainingFrequency_m").change(function(){
+        m = $('#add_trainingFrequency_m').val();
+        M_t = m;
+        resetTrainingFrequency();
+    });
+
+    $("#add_trainingFrequency_s").change(function(){
+        s = $('#add_trainingFrequency_s').val();
+        S_t = s;
+        resetTrainingFrequency();
+    });
+    function getTrainingFrequency(){
+        seconds = H_t*60*60 + M_t*60 + S_t * 1;
+        return seconds;
+    }
+    function getFetchFrequency(){
+        seconds = H*60*60 + M*60 + S * 1;
+        return seconds;
+    }
+
+{% endblock %}

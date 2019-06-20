@@ -1,0 +1,71 @@
+{% extends "./base.html" %}
+{% block content %}
+
+    <br/>
+    <p class="text-center"><strong>Upload log batched by jenkins url</strong></p>
+    <br/><br/>
+    <form class="form-horizontal" role="form" action="{% url 'LogCollection:get_jenkins_log_by_build_num_internal' %}" method="post">
+
+        <div class="form-group">
+            <label for="logurl" class="col-sm-2 control-label">Jenkins job url</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="logurl" name="job_home_url" placeholder="like this: https://cc-hss-ci.rnd.ki.sw.ericsson.se/job/JNB7__CDE__OSC/">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="build_num_start" class="col-sm-2 control-label">Build_num_start</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="build_num_start"  name="build_num_start" placeholder="Please input build num start">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="build_num_end" class="col-sm-2 control-label">build_num_end</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="build_num_end"  name="build_num_end" placeholder="Please input build_num_end">
+            </div>
+        </div>
+{#        <div class="form-group">#}
+{#            <label for="team" class="col-sm-2 control-label">Team</label>#}
+{#            <div class="col-sm-9">#}
+{#                <select class="form-control" name="team">#}
+{#                    <option id="team" value="">Please select team</option>#}
+{#                    {% for team in Teams %}#}
+{#                        <option id="team" value="{{team.name}}">{{team.name}}</option>#}
+{#                    {% endfor %}#}
+{#              </select>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="form-group">#}
+{#            <label for="error_type" class="col-sm-2 control-label">Error type</label>#}
+{#            <div class="col-sm-9">#}
+{#                <select class="form-control" name="error_type">#}
+{#                    <option id="error_type" value="">Please select error type</option>#}
+{#                    {% for error in ErrorTypes %}#}
+{#                        <option id="error" value="{{error.name}}">{{error.name}}</option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{#            </div>#}
+{#        </div>#}
+        <div class="form-group">
+            <label for="description" class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="description" name="description" placeholder="Please input description">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </div>
+    </form>
+
+    {% csrf_token %}
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+{% endblock %}

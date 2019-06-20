@@ -1,0 +1,59 @@
+{% extends "./base.html" %}
+{% block content %}
+
+    <br/>
+    <p class="text-center"><strong>Upload log by specific log</strong></p>
+    <br/><br/>
+    <form class="form-horizontal" role="form" action="{% url 'LogCollection:UploadLogHander' %}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="logurl" class="col-sm-2 control-label">Select log</label>
+            <div class="col-sm-9">
+                {% csrf_token %}
+                <input type="file" name="logfile" multiple="multiple">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="team" class="col-sm-2 control-label">Team</label>
+            <div class="col-sm-9">
+                <select class="form-control" name="team">
+                    <option id="team" value="">Please select team</option>
+                    {% for team in Teams %}
+                        <option id="team" value="{{team.name}}">{{team.name}}</option>
+                    {% endfor %}
+              </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="error_type" class="col-sm-2 control-label">Error type</label>
+            <div class="col-sm-9">
+                <select class="form-control" name="error_type">
+                    <option id="error_type" value="">Please select error type</option>
+                    {% for error in ErrorTypes %}
+                        <option id="error" value="{{error.name}}">{{error.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description" class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="description" name="description" placeholder="Please input description">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </div>
+    </form>
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+{% endblock %}

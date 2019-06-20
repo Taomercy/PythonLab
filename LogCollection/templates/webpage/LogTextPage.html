@@ -1,0 +1,22 @@
+{% extends "./base.html" %}
+{% block content %}
+
+    <p class="text-center"><strong>Show log details</strong></p>
+
+    {% autoescape off%}
+        <div>
+            {% for line in log_txt %}
+                {{ line }}<br>
+            {% endfor %}
+        </div><br/><br/><br/><br/>
+    {% endautoescape %}
+
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+{% endblock %}
