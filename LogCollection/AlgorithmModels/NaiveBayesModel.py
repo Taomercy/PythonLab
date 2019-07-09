@@ -6,11 +6,9 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.externals import joblib
-import log_filter
-from LogAnalysis.DataPrepare import get_all_files_in_the_dir
-from webpage.models import *
-from webpage.config import *
-from DataPlot import plot_classifier
+from DataProcessingAndPlot import log_filter
+from DataProcessingAndPlot.DataPrepare import get_all_files_in_the_dir
+from LogAnalysis.config import *
 from LogAnalysis.models import *
 
 
@@ -74,7 +72,11 @@ def training_by_naive_bayes(train_dirname, job_name=None, scheduler=False):
     X_train_tfidf = transformer.fit_transform(X_train_counts)
     joblib.dump(transformer, get_tfidf_model_path(job_name=job_name))
 
+    start_time = time.clock()
     clf = MultinomialNB().fit(X_train_tfidf, y_train)
+    end_time = time.clock()
+    duration = end_time - start_time
+
     joblib.dump(clf, get_native_bayes_model_path(job_name=job_name))
 
     X_new_counts = vectorizer.transform(X_test)
@@ -84,10 +86,12 @@ def training_by_naive_bayes(train_dirname, job_name=None, scheduler=False):
     metrics_report = metrics.classification_report(y_test, predicted)
     metrics_score = metrics.accuracy_score(y_test, predicted)
 
+    InitMLModel()
     ScoreStatistic.objects.create(job=Job.objects.get(name=job_name),
-                                  model=model_str['naive'],
+                                  model=MLModel.objects.get(name='naive bayes'),
                                   dataset_num=len(logLabels),
-                                  score=metrics_score)
+                                  score=metrics_score,
+                                  duration=duration)
 
     if not scheduler:
         print "metrics_score:", metrics_score

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
-import os, re, sys
+import os
 import urllib
-from bs4 import BeautifulSoup
-from webpage.config import LOG_SAVING_PATH
+from config import LOG_SAVING_PATH
 # Create your models here.
 
 
@@ -38,8 +37,8 @@ class Job(models.Model):
     job_dir = models.TextField()
     ismonitored = models.BooleanField()
     fetchSizeOfOneTime = models.IntegerField(default=1)
-    fetchFrequency = models.IntegerField()
-    trainingFrequency = models.IntegerField()
+    fetchFrequency = models.IntegerField(default=3600)
+    trainingFrequency = models.IntegerField(default=3600)
     description = models.TextField()
     # latest_config_modify_time = models.TimeField()
 
@@ -55,7 +54,22 @@ class Job(models.Model):
 
 class ExitStatus(models.Model):
     name = models.TextField()
+    color = models.TextField()
     description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+
+def InitExitStatus():
+    if not ExitStatus.objects.filter(name='SUCCESS'):
+        ExitStatus.objects.create(name='SUCCESS', color='#008000')
+    if not ExitStatus.objects.filter(name='FAILURE'):
+        ExitStatus.objects.create(name='FAILURE', color='#FF0000')
+    if not ExitStatus.objects.filter(name='UNSTABLE'):
+        ExitStatus.objects.create(name='UNSTABLE', color='#FFFF00')
+    if not ExitStatus.objects.filter(name='ABORTED'):
+        ExitStatus.objects.create(name='ABORTED', color='#808080')
 
 
 class Log(models.Model):
@@ -67,6 +81,9 @@ class Log(models.Model):
     exit_status = models.ForeignKey(ExitStatus, primary_key=False, null=True, blank=True, on_delete=models.SET_NULL)
     error_type = models.ForeignKey(ErrorType, primary_key=False, null=True, blank=True,
                                    on_delete=models.SET_NULL)
+    duration = models.FloatField(default=0.0)
+    timestamp = models.IntegerField(default=0)
+
     description = models.TextField(null=True)
 
     def __str__(self):
@@ -76,63 +93,64 @@ class Log(models.Model):
         return os.path.join(self.job.job_dir, self.name)
 
     class Meta:
-        ordering = ('-name',)
+        ordering = ('-timestamp', )
 
 
-class JobUrlModel(object):
+class JobBuild(object):
     job_url = None
-    url = None
+    build_url = None
     host = None
-    html = None
-    title = None
+    fullDisplayName = None
     job_name = None
     job_dir = None
     build_num = None
-    build_label = None
     stat = None
-    parent_job_name = None
     codes_num = None
-    console_obj = None
+    duration = None
+    building = None
+    timestamp = None
+    console_text = None
 
-    def __init__(self, url, parent_job_name=""):
-        self.job_url = '/'.join(url.split('/')[:-2])
+    @staticmethod
+    def get_python_api(url):
+        return url + '/api/python?pretty=true'
 
-        if url.split('/')[-1] != 'console':
-            url += 'console'
-        self.url = url
-        try:
-            job_url_obj = urllib.urlopen(self.url)
-            self.html = BeautifulSoup(job_url_obj, 'html.parser')
-        except:
+    @staticmethod
+    def check_url_visit_code(url):
+        job_url_obj = urllib.urlopen(url)
+        code = job_url_obj.getcode()
+        if code != 200:
+            print "[%s] error code" % url, code
+            return code
+        else:
+            return 0
+
+    def __init__(self, build_url, parent_job_name=""):
+        self.job_url = '/'.join(build_url.split('/')[:-2])
+        job_api = self.get_python_api(self.job_url)
+        if self.check_url_visit_code(self.job_url):
+            return
+        job_data = eval(urllib.urlopen(job_api).read())
+        self.job_name = job_data['name']
+
+        self.build_url = build_url
+        if self.check_url_visit_code(self.build_url):
             return
 
-        proto, rest = urllib.splittype(url)
+        proto, rest = urllib.splittype(build_url)
         res, rest = urllib.splithost(rest)
         self.host = res
 
-        self.title = self.html.title.string
-        self.job_name = self.title.split(' ')[0]
-        self.build_label = self.title.split(' ')[1]
+        build_api = self.get_python_api(self.build_url)
+        build_data = eval(urllib.urlopen(build_api).read())
+        self.fullDisplayName = build_data['fullDisplayName']
+        self.build_num = build_data['number']
+        self.stat = build_data['result']
+        self.duration = build_data['duration']
+        self.timestamp = build_data['timestamp']
+        self.building = build_data['building']
 
-        regex = "\d+"
-        self.build_num = re.findall(regex, self.title.split(' ')[1])[0]
-        self.parent_job_name = parent_job_name
-
-        console_text_url = self.get_console_text_url()
-        console_obj = urllib.urlopen(console_text_url)
-        code = console_obj.getcode()
-        if code != 200:
-            print "[%s] error code" % console_text_url, code
-            return
-        regex = 'Finished:.*'
-        try:
-            stat = re.findall(regex, console_obj.read())[-1].split(': ')[1]
-            self.stat = stat
-        except Exception as e:
-            print "Error of getting stat [%s]" % e
-            return
-        if not ExitStatus.objects.filter(name=stat):
-            ExitStatus.objects.create(name=stat)
+        InitExitStatus()
 
         job = Job.objects.filter(name=self.job_name)
         if not job:
@@ -141,24 +159,28 @@ class JobUrlModel(object):
                 os.makedirs(self.job_dir)
             Job.objects.create(name=self.job_name, url=self.job_url, job_dir=self.job_dir, ismonitored=False)
         else:
-            if not job[0].url:
-                job[0].url = self.job_url
-            self.job_dir = job[0].job_dir
-            if not job[0].job_dir:
-                job[0].job_dir = self.job_dir
-            job[0].save()
+            job = Job.objects.get(name=self.job_name)
+            if not job.url:
+                job.url = self.job_url
+            self.job_dir = job.job_dir
+            if not job.job_dir:
+                job.job_dir = self.job_dir
+            job.save()
 
-    def get_url(self):
-        return self.url
+        console_text_url = self.get_console_text_url()
+        console_obj = urllib.urlopen(console_text_url)
+        reads = console_obj.read()
+        self.console_text = reads
+        self.codes_num = len(reads)
+
+    def get_build_url(self):
+        return self.build_url
 
     def get_host(self):
         return self.host
 
-    def get_html(self):
-        return self.html
-
-    def get_title(self):
-        return self.title
+    def get_full_display_name(self):
+        return self.fullDisplayName
 
     def get_job_name(self):
         return self.job_name
@@ -166,15 +188,27 @@ class JobUrlModel(object):
     def get_build_num(self):
         return self.build_num
 
+    def get_duration(self):
+        return self.duration
+
+    def get_timestamp(self):
+        return self.timestamp
+
     def get_console_text_url(self):
-        console_text_url = self.url.replace('console', 'consoleText')
+        console_text_url = self.build_url + 'consoleText'
         return console_text_url
+
+    def get_console_text(self):
+        return self.console_text
+
+    def get_codes_num(self):
+        return self.codes_num
 
     def get_stat(self):
         return self.stat
 
     def get_log_name(self):
-        log_name = "%s_%s.log" % (self.job_name, self.build_label)
+        log_name = "%s.log" % self.fullDisplayName.replace(' ', '').replace('#','-')
         return log_name
 
     def save_console_text(self, path=None):
@@ -196,67 +230,48 @@ class JobUrlModel(object):
             with open(log_name, 'w') as fw:
                 reads = console_obj.read()
                 if not reads:
-                    return None
+                    return 3
                 fw.writelines(reads)
-                self.codes_num = len(reads)
-        except:
+        except Exception as e:
+            print e
             return 2
         return 0
 
-    def get_codes_num(self):
-        return self.codes_num
-
-    def get_img_from_html(self):
-        imgs = self.html.find_all('img')
-        return imgs
-
-    def get_links_from_html(self):
-        links_list = []
-        links = self.html.find_all('a')
-        for link in links:
-            lk = "https://" + str(self.host) + str(link.get('href'))
-            links_list.append(lk)
-        return links_list
-
-    def find_sub_job_link(self):
-        links_list = self.get_links_from_html()
-        sub_job_list = []
-        regex = r'job/.*/[0-9]{0,10}/$'
-        for link in links_list:
-            if re.findall(regex, link):
-                if self.job_name in link or 'ExecuteTestSuite' in link:
-                    continue
-                link_model = JobUrlModel(link)
-                if "Error report" in link_model.get_title():
-                    continue
-                sub_job_list.append(link)
-        return sub_job_list
+    def data_supplement(self, log_name):
+        log = Log.objects.get(name=log_name)
+        log.exit_status = ExitStatus.objects.get(name=self.stat)
+        log.duration = self.duration
+        log.timestamp = self.timestamp
+        log.save()
 
     def save(self, scheduler=False, team_name=None, error_type=None, description=None):
         log_name = self.get_log_name()
         print "start saving [%s]" % log_name
         if Log.objects.filter(name=log_name):
             print "the log has been exist"
+            self.data_supplement(log_name)
             return 1
 
-        if self.save_console_text():
-            print "save log fail"
-            return 2
-        else:
-            print "console log saved"
+        if self.building is True:
+            print "job is building"
+            return 1
 
+        param = {}
+        param['name'] = log_name
+        param['job'] = Job.objects.get(name=self.job_name)
+        param['codes_number'] = self.get_codes_num()
+        param['istrainingset'] = True
+        param['exit_status'] = ExitStatus.objects.get(name=self.stat)
+        param['duration'] = self.duration
+        param['timestamp'] = self.timestamp
+        param['description'] = description
         if scheduler:
             # TODO: Temporarily associate the error type with the exit state
             if not ErrorType.objects.filter(name=self.stat):
                 error_type = ErrorType.objects.create(name=self.stat)
             else:
                 error_type = ErrorType.objects.get(name=self.stat)
-            log = Log.objects.create(name=log_name,
-                                     job=Job.objects.get(name=self.job_name),
-                                     codes_number=self.get_codes_num(),
-                                     istrainingset=False,
-                                     exit_status=ExitStatus.objects.get(name=self.stat),
-                                     error_type=error_type)
+            param['error_type'] = error_type
         else:
             if not team_name:
                 print "need param team name"
@@ -264,19 +279,19 @@ class JobUrlModel(object):
             if not error_type:
                 print "need param error type"
                 return 4
-            log = Log.objects.create(name=log_name,
-                                     job=Job.objects.get(name=self.job_name),
-                                     team=Team.objects.get(name=team_name),
-                                     codes_number=self.get_codes_num(),
-                                     istrainingset=False,
-                                     exit_status=ExitStatus.objects.get(name=self.stat),
-                                     error_type=ErrorType.objects.get(name=error_type),
-                                     description=description)
+            param['team'] = Team.objects.get(name=team_name)
+            param['error_type'] = ErrorType.objects.get(name=error_type)
+
+        if not os.path.exists(self.job_dir):
+            os.makedirs(self.job_dir)
+        if self.save_console_text(path=self.job_dir):
+            print "save log fail"
+            return 2
+        else:
+            print "console log saved"
+
+        log = Log.objects.create(**param)
         log.save()
-        print "[%s] log save success" % self.url
+        print "[%s] log save success" % self.build_url
+
         return 0
-
-
-
-
-

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from __future__ import division
-from webpage.models import *
+from LogAnalysis.models import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import numpy as np
 
@@ -40,6 +40,30 @@ def get_context_of_files(dirname):
 def get_training_jobs():
     context = {}
     context['training_jobs'] = Job.objects.all()
+    return context
+
+
+def get_ml_models():
+    context = {}
+    context['ml_models'] = MLModel.objects.all()
+    return context
+
+
+def get_plotColor():
+    context = {}
+    context['plotColor'] = PlotColor.objects.all()
+    return context
+
+
+def get_plotLineStyle():
+    context = {}
+    context['plotLineStyle'] = PlotLineStyle.objects.all()
+    return context
+
+
+def get_plotMarker():
+    context = {}
+    context['plotMarker'] = PlotMarker.objects.all()
     return context
 
 

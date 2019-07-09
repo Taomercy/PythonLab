@@ -1,16 +1,31 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.contrib import messages
-import webpage.config as WebConfig
-from NaiveBayesModel import *
-from DataPrepare import *
-from MLPClassifierModel import *
-from KMeansModel import *
+from AlgorithmModels.NaiveBayesModel import *
+from DataProcessingAndPlot.DataPrepare import *
+from AlgorithmModels.MLPClassifierModel import *
+from AlgorithmModels.KMeansModel import *
 import threading
-from DataPlot import bar_plot_codes_stat
-from DataPlot import scores_statistic_plot
+from DataProcessingAndPlot.DataPlot import timestamp_duration_plot
+from DataProcessingAndPlot.DataPlot import scores_statistic_plot
+import json
+from django.core.paginator import Paginator
+from common.TimeUtils import *
+
 # Create your views here.
+global plot_job
+global plot_model
+
+
+def DBInit(request):
+    try:
+        InitMLModel()
+    except Exception as e:
+        messages.error(request, e)
+        return HttpResponse('{"failed":"success"}', content_type='application/json')
+    return HttpResponse('{"status":"success"}', content_type='application/json')
 
 
 def LogAnalysisPage(request):
@@ -84,9 +99,9 @@ def TrainingLogByKMeans(request):
 
 
 def LogPredictPage(request):
-    if not os.path.isdir(WebConfig.LOG_PREDICT_PATH):
-        os.mkdir(WebConfig.LOG_PREDICT_PATH)
-    return render(request, 'LogAnalysis/LogPredictPage.html', context=get_context_of_files(WebConfig.LOG_PREDICT_PATH))
+    if not os.path.isdir(LOG_PREDICT_PATH):
+        os.mkdir(LOG_PREDICT_PATH)
+    return render(request, 'LogAnalysis/LogPredictPage.html', context=get_context_of_files(LOG_PREDICT_PATH))
 
 
 def UploadPredictLog(request):
@@ -99,8 +114,8 @@ def UploadPredictLog(request):
         def run(self):
             # print "Starting thread [%d]" % self.threadID
             print "catching url:", self.url
-            job_url = JobUrlModel(self.url)
-            job_url.save_console_text(WebConfig.LOG_PREDICT_PATH)
+            build = JobBuild(self.url)
+            build.save_console_text(LOG_PREDICT_PATH)
 
             # print "Exiting thread [%d]" % self.threadID
 
@@ -109,10 +124,10 @@ def UploadPredictLog(request):
         build_num_start = request.POST.get('build_num_start', "")
         build_num_end = request.POST.get('build_num_end', "")
         if build_num_start == "" or build_num_end == "":
-            job_url = JobUrlModel(job_home_url)
-            job_url.save_console_text(WebConfig.LOG_PREDICT_PATH)
+            build = JobBuild(job_home_url)
+            build.save_console_text(LOG_PREDICT_PATH)
             return render(request, 'LogAnalysis/LogPredictPage.html',
-                          context=get_context_of_files(WebConfig.LOG_PREDICT_PATH))
+                          context=get_context_of_files(LOG_PREDICT_PATH))
 
         build_num_vector = [num for num in range(int(build_num_start), int(build_num_end))]
         url_list = [job_home_url+str(build_num)+"/console" for build_num in build_num_vector]
@@ -130,7 +145,7 @@ def UploadPredictLog(request):
         print "All catching log threads exited!"
         messages.success(request, "哈哈哈哈，上传成功啦!")
 
-    return render(request, 'LogAnalysis/LogPredictPage.html', context=get_context_of_files(WebConfig.LOG_PREDICT_PATH))
+    return render(request, 'LogAnalysis/LogPredictPage.html', context=get_context_of_files(LOG_PREDICT_PATH))
 
 
 def PreditLogDelete(request):
@@ -140,50 +155,161 @@ def PreditLogDelete(request):
         print "%s has been deleted" % log_name
         messages.success(request, "delete success!")
 
-    return render(request, 'LogAnalysis/LogPredictPage.html', context=get_context_of_files(WebConfig.LOG_PREDICT_PATH))
+    return render(request, 'LogAnalysis/LogPredictPage.html', context=get_context_of_files(LOG_PREDICT_PATH))
 
 
 def PredictByMLP(request):
-    context = predict_by_MLP(WebConfig.LOG_PREDICT_PATH)
+    context = predict_by_MLP(LOG_PREDICT_PATH)
     return render(request, 'LogAnalysis/LogPredictPage.html', context=context)
 
 
 def PredictByBayes(request):
-    context = predict_by_naive_bayes(WebConfig.LOG_PREDICT_PATH)
+    context = predict_by_naive_bayes(LOG_PREDICT_PATH)
     return render(request, 'LogAnalysis/LogPredictPage.html', context=context)
 
 
-def PlotCodesNumWithStat(request):
+def BuildingStatisticPage(request):
     context = get_training_jobs()
-    jobs = Job.objects.all()
-    figs = []
-    for job in jobs:
-        fig = bar_plot_codes_stat(job)
-        if fig:
-            figs.append(fig)
-    context['images'] = figs
-    return render(request, 'LogAnalysis/LogAnalysisPage.html', context=context)
+    return render(request, 'LogAnalysis/BuildingStatisticPage.html', context=context)
+
+
+def BuildingStatisticSubmit(request):
+    context = get_training_jobs()
+    global plot_job
+    time_start = None
+
+    if request.method == "POST":
+        plot_job = request.POST.get('training_job', None)
+        time_start = get_timestampdelta("OneMonth")
+
+    if request.method == "GET":
+        time = request.GET.get("time")
+        time_start = get_timestampdelta(time)
+
+    job = Job.objects.get(name=plot_job)
+    try:
+        fig = timestamp_duration_plot(job, time_start=time_start)
+        context['images'] = [fig]
+    except Exception as e:
+        print "Exception:", e
+        messages.error(request, e)
+    return render(request, 'LogAnalysis/BuildingStatisticPage.html', context=context)
 
 
 def ScoresStatisticPage(request):
     context = get_training_jobs()
-    models=WebConfig.model_str
+    models = model_str
     context['models'] = [models]
-    return render(request, 'LogAnalysis/LogScheduleAnalysisPage.html', context=context)
+    return render(request, 'LogAnalysis/ScoresStatisticPage.html', context=context)
 
 
-def ScoresStatistic(request):
+def ScoresStatisticSubmit(request):
     context = get_training_jobs()
-    models = WebConfig.model_str
+    models = model_str
     context['models'] = [models]
+    global plot_job
+    global plot_model
+    time_start = None
+
     if request.method == "POST":
-        job_name = request.POST.get('training_job')
-        model = request.POST.get('model')
+        plot_job = request.POST.get('training_job')
+        plot_model = request.POST.get('model')
+        time_start = get_timedelta("OneMonth")
+
+    if request.method == "GET":
+        time = request.GET.get("time")
+        time_start = get_timedelta(time)
+
+    try:
+        fig = scores_statistic_plot(plot_job, time_start=time_start, model=plot_model)
+        context['images'] = [fig]
+    except Exception as e:
+        print "Exception:", e
+        messages.error(request, e)
+    return render(request, 'LogAnalysis/ScoresStatisticPage.html', context=context)
+
+
+def MLModelsPage(request):
+    return render(request, 'LogAnalysis/MLModels.html')
+
+
+def ModelList(request):
+    def tableData(request, dataList):
+        if request.method == "POST":
+            print(request.POST)
+            limit = request.POST.get('limit')  # how many items per page
+            offset = request.POST.get('offset')  # how many items in total in the DB
+
+            if dataList:
+                response_data = {'total': dataList.count(), 'rows': []}
+                if not offset:
+                    offset = 0
+                if not limit:
+                    limit = 10
+                page = int(int(offset) / int(limit) + 1)
+                pageinator = Paginator(dataList, limit)  # 开始做分页
+                data = pageinator.page(page)
+
+                for model in data:
+                    response_data['rows'].append({
+                        "Name": model.name,
+                        "Color": str(model.plot_color),
+                        "LineStyle": str(model.line_style),
+                        "Marker": str(model.marker),
+                    })
+                return HttpResponse(json.dumps(response_data))  # 需要json处理下数据格式
+            else:
+                return HttpResponse(json.dumps({'total': 0, 'rows': []}))
+    models = []
+    if request.method == "POST":
+        models = MLModel.objects.all()
+    return tableData(request, models)
+
+
+def AddModelPage(request):
+    context = get_plotColor()
+    context.update(get_plotLineStyle())
+    context.update(get_plotMarker())
+    context.update(get_ml_models())
+    return render(request, 'LogAnalysis/AddModelPage.html', context=context)
+
+
+def AddModel(request):
+    context = get_plotColor()
+    context.update(get_plotLineStyle())
+    context.update(get_plotMarker())
+    context.update(get_ml_models())
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        model = MLModel.objects.filter(name=name)
+        if model:
+            messages.error(request, "The model is exist!")
+            return render(request, 'LogAnalysis/AddModelPage.html', context=context)
+
+        color_id = request.POST.get('color')
+        lineStyle_id = request.POST.get('lineStyle')
+        marker_id = request.POST.get('marker')
+
+        param = {}
+        if color_id:
+            param['plot_color_id'] = int(color_id)
+        if lineStyle_id:
+            param['line_style_id'] = int(lineStyle_id)
+        if marker_id:
+            param['marker_id'] = int(marker_id)
+        MLModel.objects.create(name=name, **param).save()
+    return render(request, 'LogAnalysis/MLModels.html')
+
+
+def DeleteModel(request):
+    if request.method == "POST":
+        model_name = request.POST.get('model_name', None)
         try:
-            fig = scores_statistic_plot(job_name, model)
-            context['images'] = [fig]
+            model = MLModel.objects.get(name=model_name)
+            model.delete()
         except Exception as e:
-            print "Exception:", e
+            print e
             messages.error(request, e)
-        return render(request, 'LogAnalysis/LogScheduleAnalysisPage.html', context=context)
-    return render(request, 'LogAnalysis/LogScheduleAnalysisPage.html', context=context)
+            return render(request, 'LogAnalysis/MLModels.html')
+        messages.success(request, "delete success!")
+    return render(request, 'LogAnalysis/MLModels.html')

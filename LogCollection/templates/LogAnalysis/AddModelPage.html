@@ -1,111 +1,68 @@
-{% extends "./base.html" %}
+{% extends "./../webpage/base.html" %}
 {% block content %}
 
     <div class="addBody" style="width:100%; position: absolute;top:10px">
          <div class="col-sm-12">
              <div class="ibox float-e-margins">
-                 <h3 class="text-center">Add a new Job</h3>
+                 <h3 class="text-center">Add a new Training model</h3>
                  <div class="ibox-content">
-                     <form id="addForm" method="post" class="form-horizontal" action="{% url 'LogCollection:SaveNewJob' %}">
+                     <form id="addForm" method="post" class="form-horizontal" action="{% url 'LogAnalysisPage:AddModel' %}">
                          <div class="form-group">
-                             <label class="col-sm-2 control-label">JobName</label>
+                             <label class="col-sm-2 control-label">Name</label>
+{#                             <div class="col-sm-10">#}
+{#                                 <select class="form-control" name="name">#}
+{#                                     {% for model in ml_models %}#}
+{#                                         <option value="{{model.name}}">{{model.name}}</option>#}
+{#                                     {% endfor %}#}
+{#                                 </select>#}
+{#                             </div>#}
                              <div class="col-sm-10">
                                  <input type="text" class="form-control" name="name" id="add_name"/>
                              </div>
                          </div>
-
+                         <div class="form-group">
+                             <label class="col-sm-2 control-label">Plot Color</label>
+                             <div class="col-sm-10">
+                                 <select class="form-control" name="color">
+                                     <option value="">Please select plot color</option>
+                                     {% for color in plotColor %}
+                                         <option value="{{color.id}}">{{color.name}}</option>
+                                     {% endfor %}
+                                 </select>
+                             </div>
+                         </div>
+                         <div class="form-group">
+                             <label class="col-sm-2 control-label">Plot Line Style</label>
+                             <div class="col-sm-10">
+                                 <select class="form-control" name="lineStyle">
+                                     <option value="">Please select plot line style</option>
+                                     {% for lineStyle in plotLineStyle %}
+                                         <option value="{{lineStyle.id}}">{{lineStyle.character}}</option>
+                                     {% endfor %}
+                                 </select>
+                             </div>
+                         </div>
+                         <div class="form-group">
+                             <label class="col-sm-2 control-label">Plot Marker</label>
+                             <div class="col-sm-10">
+                                 <select class="form-control" name="marker">
+                                     <option value="">Please select plot marker</option>
+                                     {% for marker in plotMarker %}
+                                         <option value="{{marker.id}}">{{marker.name}}</option>
+                                     {% endfor %}
+                                 </select>
+                             </div>
+                         </div>
                          <div class="hr-line-dashed"></div>
                          <div class="form-group">
-                             <label class="col-sm-2 control-label">JobUrl</label>
-                             <div class="col-sm-10">
-                                 <input type="text" class="form-control" name="url" id="add_url"/>
-                             </div>
-                         </div>
-                         <div class="hr-line-dashed" style="display:none"></div>
-                         <div class="form-group" style="display:none">
-                             <label class="col-sm-2 control-label">JobDirectory</label>
-                             <div class="col-sm-10">
-                                 <input type="text" class="form-control" name="job_dir" id="add_job_dir"/>
-                             </div>
-                         </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">JobIsmonitored</label>
-                            <div class="col-sm-10">
-                                 <select class="form-control" name="ismonitored">
-                                     <option id="error_type_editing">True</option>
-                                     <option id="error_type_editing">False</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">JobFetchSizeOfOneTime</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" name="fetchSizeOfOneTime" id="add_fetchSizeOfOneTime"/>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">FetchFrequency</label>
-                            <div class="col-sm-10 form-inline">
-                                <label class="col-sm-1">Hours:</label>
-                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_h" id="add_fetchFrequency_h"/>
-                                <label class="col-sm-1">Min:</label>
-                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_m" id="add_fetchFrequency_m"/>
-                                <label class="col-sm-1">Sec:</label>
-                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="fetchFrequency_s" id="add_fetchFrequency_s"/>
-                                <label class="col-sm-1">Result:</label>
-                                <input type="text" class="form-control" name="fetchFrequency" id="add_fetchFrequency"/>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">TrainingFrequency</label>
-                            <div class="col-sm-10 form-inline">
-                                <label class="col-sm-1">Hours:</label>
-                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_h" id="add_trainingFrequency_h"/>
-                                <label class="col-sm-1">Min:</label>
-                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_m" id="add_trainingFrequency_m"/>
-                                <label class="col-sm-1">Sec:</label>
-                                <input type="text" style="width: 80px" class="text-center col-sm-1 form-control" name="trainingFrequency_s" id="add_trainingFrequency_s"/>
-                                <label class="col-sm-1">Result:</label>
-                                <input type="text" class="form-control" name="trainingFrequency" id="add_trainingFrequency"/>
-                            </div>
-{#                            <div class="col-sm-10">#}
-{#                                <input type="text" class="form-control" name="trainingFrequency" id="add_trainingFrequency"/>#}
-{#                            </div>#}
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">JobDescription</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" name="description" id="add_description"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">JobFetchSizeForStartNow</label>
-                            <div class="col-sm-3">
-                                <input type="text" class="form-control" name="jobFetchSizeForStartNow" id="add_description"/>
-                            </div>
-                            <div class="col-sm-3">
-                                 <select class="form-control" name="startNow">
-                                     <option id="error_type_editing">Select start fetch log right now or not?</option>
-                                     <option id="error_type_editing">True</option>
-                                     <option id="error_type_editing">False</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <div class="col-sm-2 col-sm-offset-2">
-                                <button type="submit" class="btn btn-default btn-block">Save</button>
+                             <div class="col-sm-2 col-sm-offset-2">
+                                 <button type="submit" class="btn btn-default btn-block">Save</button>
 {#                                <button type="button" class="btn btn-primary btn-block"  id="add_saveBtn">保存</button>#}
-                            </div>
-                            <div class="col-sm-2 col-sm-offset-1">
-                                <button type="button" class="btn btn-default btn-block"  id="add_backBtn">Back</button>
-                            </div>
-                        </div>
+                             </div>
+                             <div class="col-sm-2 col-sm-offset-1">
+                                 <button type="button" class="btn btn-default btn-block"  id="add_backBtn">Back</button>
+                             </div>
+                         </div>
                          <br/><br/><br/>
                         </form>
                     </div>
@@ -256,7 +213,7 @@
     });
 //增加按钮事件
     $('#add_backBtn').click(function(){
-         $(location).prop('href', '{% url 'LogAnalysisPage:MLModelsPage' %}')
+         $(location).prop('href', '{% url 'LogCollection:SchedulerPage' %}')
     })
 
 {#    $('#add_trainingFrequency').hunterTimePicker();#}

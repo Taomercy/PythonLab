@@ -40,16 +40,25 @@
         <li><a href="#"><i class="glyphicon glyphicon-film"></i><span>Demo</span></a></li>
         <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i><span>Docs</span></a></li>
         <li><a href="#"><i class="glyphicon glyphicon-certificate"></i><span>Team</span></a></li>
-        <li><a href="#"><i class="glyphicon glyphicon-cog"></i><span>SystemConfig</span></a></li>
+        <li class="dropdown">
+            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="glyphicon glyphicon-cog"></i><span>SystemConfig</span><b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu pull-right" style="min-width: 100%">
+                <li><a id="dbinit" href="#"><i class="glyphicon glyphicon-globe"></i>DBInit</a></li>
+{#                <li><a href="#"><i class="glyphicon glyphicon-star"></i> LoginInfo</a></li>#}
+{#                <li><a href="#"><i class="glyphicon glyphicon-star-empty"></i> Exit</a></li>#}
+            </ul>
+        </li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
         <li><a href="#"><i class="glyphicon glyphicon-record"></i>ToDo</a></li>
         <li><a href="#"><i class="glyphicon glyphicon-tags"></i>ChangePwd</a></li>
         <li class="dropdown">
-            <a class="dropdown-toggle userinfo" data-toggle="dropdown">
+            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="glyphicon glyphicon-user"></i><span>UserInfo</span><b class="caret"></b>
             </a>
-            <ul class="dropdown-menu pull-right">
+            <ul class="dropdown-menu pull-right" style="min-width: 100%">
                 <li><a href="#"><i class="glyphicon glyphicon-star"></i> LoginInfo</a></li>
                 <li><a href="#"><i class="glyphicon glyphicon-star-empty"></i> Exit</a></li>
             </ul>
@@ -71,12 +80,18 @@
                             <li class="bb" role="presentation"><a class="menu-title" role="menuitem" data-id="b" href="{% url 'LogCollection:BatchCollectionLog' %}"><i class="glyphicon glyphicon-leaf"></i><span class="menu-text">By Batch</span></a></li>
                         </ul>
                     </li>
-                    <li class=""><a class="menu-title" data-id="a" href="{% url 'LogAnalysisPage:LogAnalysisPage' %}"><i class="glyphicon glyphicon-eye-open"></i><span class="menu-text">ANALYSIS LOG</span></a></li>
+                    <li class="has-children-1"><a class="menu-title" data-id="1"><i class="glyphicon glyphicon-eye-open"></i><span class="menu-text">ANALYSIS LOG</span><span class="glyphicon glyphicon-chevron-down"></span></a>
+                        <ul class="menu-submenu-1">
+                            <li class="bu" role="presentation"><a class="menu-title" role="menuitem" data-id="u" href="{% url 'LogAnalysisPage:LogAnalysisPage' %}"><i class="glyphicon glyphicon-leaf"></i><span class="menu-text">Training log</span></a></li>
+                            <li class="bd" role="presentation"><a class="menu-title" role="menuitem" data-id="d" href="{% url 'LogAnalysisPage:MLModelsPage' %}"><i class="glyphicon glyphicon-leaf"></i><span class="menu-text">ML models</span></a></li>
+                        </ul>
+                    </li>
                     <li class=""><a class="menu-title" data-id="ctype" href="{% url 'LogCollection:CreateErrorType' %}"><i class="glyphicon glyphicon-tree-conifer"></i><span class="menu-text">Create new error type</span></a></li>
                     <li class=""><a class="menu-title" data-id="cteam" href="{% url 'LogCollection:CreateTeam' %}"><i class="glyphicon glyphicon-plus-sign"></i><span class="menu-text">Create new team</span></a></li>
-                    <li class=""><a class="menu-title" data-id="plot" href="{% url 'LogAnalysisPage:PlotCodesNumWithStat' %}"><i class="glyphicon glyphicon-tree-deciduous"></i><span class="menu-text">Plot</span></a></li>
+                    <li class=""><a class="menu-title" data-id="plot" href="{% url 'LogAnalysisPage:BuildingStatisticPage' %}"><i class="glyphicon glyphicon-tree-deciduous"></i><span class="menu-text">Plot</span></a></li>
                     <li class=""><a class="menu-title" data-id="schedule" href="{% url 'LogCollection:SchedulerPage' %}"><i class="glyphicon glyphicon-asterisk"></i><span class="menu-text">Schedule Task</span></a></li>
                     <li class=""><a class="menu-title" data-id="schore" href="{% url 'LogAnalysisPage:ScoresStatisticPage' %}"><i class="glyphicon glyphicon-tint"></i><span class="menu-text">Scores Statistic</span></a></li>
+                    <li class=""><a class="menu-title" data-id="predict" href="{% url 'LogPredict:LogPredcitHomePage' %}"><i class="glyphicon glyphicon-tint"></i><span class="menu-text">Log Predict</span></a></li>
                 </ul>
             </div>
         </div>
@@ -105,18 +120,33 @@ Copyright AIDevOps
 </html>
 
 <script>
-    $(function(){
-        // 默认显示
-        $(".dropdown-toggle").dropdown();
-    });
-
-    $(".dropdown-toggle").click(function(){
-        $(".dropdown-menu").toggle();
+    $(".has-children-1").click(function(){
+        $(".menu-submenu-1").toggle();
     });
     $(".has-children").click(function(){
         $(".menu-submenu").toggle();
     });
     $("button").addClass("btn btn-primary");
+
+    //停止scheduler事件按钮
+    $('#dbinit').click(function(){
+        if(confirm('Are you sure to init database?')){
+            $.ajax({
+                type:'post',
+                traditional :true,
+                url:'{% url 'LogAnalysisPage:DBInit' %}',
+                dataType: 'json',
+                success:function(data){
+                    if(data.status == 'success'){
+                        alert("Scheduler start success");
+                    }else {
+                        alert("Scheduler start failed");
+                    }
+                }
+            });
+        }
+        return false;
+    });
 
     {% block script %}{% endblock %}
 </script>

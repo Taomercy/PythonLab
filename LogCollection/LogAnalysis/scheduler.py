@@ -4,8 +4,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 import time
 from webpage.models import *
-from NaiveBayesModel import training_by_naive_bayes
-from MLPClassifierModel import training_by_SVM_and_MLP
+from AlgorithmModels.NaiveBayesModel import training_by_naive_bayes
+from AlgorithmModels.MLPClassifierModel import training_by_SVM_and_MLP
 global scheduler
 
 
@@ -17,23 +17,17 @@ def training_scheduler(job):
     print "%s training  end" % job.name
 
 
-class TrainingSchedulerMain():
+class TrainingSchedulerMain(object):
     scheduler = None
 
-    def __init__(self, now_start=False):
+    def __init__(self):
         logging.basicConfig()
         logging.getLogger('apscheduler').setLevel(logging.DEBUG)
         self.scheduler = BackgroundScheduler()
-        self.scheduler.start()
-        jobs = Job.objects.filter(ismonitored=True)
-        for job in jobs:
-            if now_start:
-                self.scheduler.add_job(training_scheduler, args=[job])
-            self.scheduler.add_job(training_scheduler, 'interval', seconds=job.trainingFrequency, args=[job])
 
     def job_scheduler_add(self, job):
         if job.ismonitored:
-            self.scheduler.add_job(training_scheduler, 'interval', seconds=job.trainingFrequency, args=[job])
+            self.scheduler.add_job(training_scheduler, 'interval', seconds=job.trainingFrequency, args=[job], jitter=600)
             return 0
         return 1
 
@@ -56,6 +50,12 @@ class TrainingSchedulerMain():
             if task.args[0].name == job.name:
                 return 0
         return 1
+
+    def scheduler_start(self):
+        self.scheduler.start()
+        jobs = Job.objects.filter(ismonitored=True)
+        for job in jobs:
+            self.scheduler.add_job(training_scheduler, 'interval', seconds=job.trainingFrequency, args=[job], jitter=600)
 
     def scheduler_shutdown(self, wait=True):
         self.scheduler.shutdown(wait=wait)

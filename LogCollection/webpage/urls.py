@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^SaveNewTeam/$', views.SaveNewTeam, name='SaveNewTeam'),
 
     url(r'^LogDelete/$', views.LogDelete, name='LogDelete'),
+    url(r'^LogsDelete/$', views.LogsDelete, name='LogsDelete'),
     url(r'^LogEditPage/$', views.LogEditPage, name='LogEditPage'),
     url(r'^LogEditSubmit/$', views.LogEditSubmit, name='LogEditSubmit'),
 
@@ -41,6 +42,8 @@ urlpatterns = [
     url(r'^AddNewJobPage/$', views.AddNewJobPage, name='AddNewJobPage'),
     url(r'^JobDelete/$', views.JobDelete, name='JobDelete'),
     url(r'^JobsDelete/$', views.JobsDelete, name='JobsDelete'),
+    url(r'^schedulerStart/$', views.schedulerStart, name='schedulerStart'),
+    url(r'^schedulerStop/$', views.schedulerStop, name='schedulerStop'),
 
     url(r'^CleanAll/$', views.CleanAll, name='CleanAll'),
 ]

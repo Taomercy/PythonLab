@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from numpy import array
-from numpy import set_printoptions, inf
-from DataPrepare import DocLogs
+from DataProcessingAndPlot.DataPrepare import DocLogs
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.externals import joblib
-from LogAnalysis.DataPrepare import DataPCA
-from LogAnalysis.DataPlot import plotBestFit
-from LogAnalysis.DataPlot import visual_2D_dataset
-from LogAnalysis.DataPlot import scatter_plot3d
+from DataProcessingAndPlot.DataPrepare import DataPCA
+from DataProcessingAndPlot.DataPlot import plotBestFit
+from DataProcessingAndPlot.DataPlot import visual_2D_dataset
+from DataProcessingAndPlot.DataPlot import scatter_plot3d
 from LogAnalysis.models import *
 from sklearn.svm import SVC
-from webpage.config import *
+from LogAnalysis.config import *
 
 
 def training_by_SVM_and_MLP(dirname, job_name=None, scheduler=False, feature_d=0):
@@ -50,17 +49,23 @@ def training_by_SVM_and_MLP(dirname, job_name=None, scheduler=False, feature_d=0
                                       fig_title='test data', fig_name='test_data.png')
         plot_path_list.append(plot_path)
 
+    start_time = time.clock()
     mlp.fit(X_train, y_train)
+    end_time = time.clock()
+    duration = end_time - start_time
+
     joblib.dump(mlp, get_mlp_model_path(job_name=job_name))
 
     mlp_predicted = mlp.predict(X_test)
     mpl_metrics_report = metrics.classification_report(y_test, mlp_predicted)
     mlp_metrics_score = metrics.accuracy_score(y_test, mlp_predicted)
 
+    InitMLModel()
     ScoreStatistic.objects.create(job=Job.objects.get(name=job_name),
-                                  model=model_str['mlp'],
+                                  model=MLModel.objects.get(name='mlp'),
                                   dataset_num=len(labels),
-                                  score=mlp_metrics_score)
+                                  score=mlp_metrics_score,
+                                  duration=duration)
 
     if not scheduler:
         plot_path = visual_2D_dataset(array(X_test), array(mlp_predicted),
@@ -69,17 +74,26 @@ def training_by_SVM_and_MLP(dirname, job_name=None, scheduler=False, feature_d=0
 
     print "[job: %s] training by svm ..." % job_name
     svc = SVC(1.0, kernel='rbf', gamma='auto')
+
+    start_time = time.clock()
     svc.fit(X_train, y_train)
+    end_time = time.clock()
+    duration = end_time - start_time
+
     joblib.dump(mlp, get_svm_model_path(job_name=job_name))
 
     svm_predicted = svc.predict(X_test)
     svm_metrics_report = metrics.classification_report(y_test, svm_predicted)
     svm_metrics_score = metrics.accuracy_score(y_test, svm_predicted)
 
+    end_time = time.clock()
+    duration = end_time - start_time
+
     ScoreStatistic.objects.create(job=Job.objects.get(name=job_name),
-                                  model=model_str['svm'],
+                                  model=MLModel.objects.get(name='svm'),
                                   dataset_num=len(labels),
-                                  score=svm_metrics_score)
+                                  score=svm_metrics_score,
+                                  duration=duration)
 
     if not scheduler:
         plot_path = visual_2D_dataset(array(X_test), array(svm_predicted),

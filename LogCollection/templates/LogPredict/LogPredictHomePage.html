@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Predict</title>
+</head>
+<body>
+<p>please input build url</p>
+<form method="post" action="{% url 'LogPredict:PredictDraft' %}">
+    <input type="text" class="form-control" name="build_url" id="build_url"/>
+    <input type="submit" value="submit">
+</form>
+<p>....</p>
+
+<p>result:</p>
+<p>the log is {{ job_name }}, this exit stats is {{ exit_status }}</p>
+<p>codes_num: {{ codes_num }}</p>
+<p>duration: {{ duration }}</p>
+<p>timestamp: {{ timestamp }}</p>
+<p>Error Info: <p>
+<pre>{{ error_context }}</pre>
+</body>
+</html>

@@ -26,14 +26,7 @@ SECRET_KEY = '!ar*qi=1tccs8%yogpc4gr(r96s+hxwglh%o$%nl$)j1_!5j!8'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "150.132.9.218",
     "127.0.0.1",
-    "10.150.64.240",
-    "192.168.63.1",
-    "146.11.27.198",
-    "192.168.63.174",
-    "10.150.65.124",
-    "146.11.22.246",
 ]
 
 
@@ -49,6 +42,7 @@ INSTALLED_APPS = [
     'webpage',
     'LogCollection',
     'LogAnalysis',
+    'LogPredict',
 ]
 
 MIDDLEWARE = [

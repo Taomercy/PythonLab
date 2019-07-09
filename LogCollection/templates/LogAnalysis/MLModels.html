@@ -1,38 +1,8 @@
-{% extends "./base.html" %}
+{% extends "./../webpage/base.html" %}
 {% block content %}
-
+    <h2 class="text-center">Training MLModels</h2>
     <div class="tableBody">
-        <div class="search panel panel-default">
-            <div class="panel-body form-group" style="margin-bottom:10px;">
-                <label class="col-sm-2 control-label" style="text-align: right; margin-top:5px">Job name：</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" name="Name" id="search_name"/>
-                </div>
-                <label class="col-sm-2 control-label" style="text-align: right; margin-top:5px">Monitor status：</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" name="monitor_status" id="search_status"/>
-                </div>
-                <div class="col-sm-2">
-                    <button class="btn btn-primary" id="search_btn">Filter</button>
-                </div>
-                <div class="col-sm-2 pull-right">
-                    <button class="btn btn-primary" id="search_clear">Clear</button>
-                </div>
-
-            </div>
-            <div class="panel-body form-group" style="margin-bottom:10px;">
-                <label class="col-sm-2 control-label" style="text-align: right; margin-top:5px">Scheduler action:</label>
-                <div class="col-sm-3">
-                    <button class="btn btn-success" id="start_btn">Start</button>
-                </div>
-                <div class="col-sm-3">
-                    <button class="btn btn-danger" id="stop_btn">Stop</button>
-                </div>
-
-            </div>
-        </div>
         <div id="toolbar" class="btn-group pull-right" style="margin-right: 20px;">
-
              <button id="btn_delete" type="button" class="btn btn-default" style="display: block">
                  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Delete
              </button>
@@ -63,7 +33,7 @@
         //初始化Table
         oTableInit.Init = function () {
             $('#mytab').bootstrapTable({
-                url: '/LogCollection/Joblist/',         //请求后台的URL（*）
+                url: '/LogAnalysisPage/ModelList/',         //请求后台的URL（*）
                 method: 'post',                      //请求方式（*）
                 toolbar: '#toolbar',                //工具按钮用哪个容器
                 striped: true,                      //是否显示行间隔色
@@ -107,36 +77,19 @@
                     visible:true
                 },
                 {
-                    title:'Url',
-                    field:'Url',
+                    title:'Color',
+                    field:'Color',
                     sortable:true
                 },
                 {
-                    title:'Log_dir',
-                    field:'Log_dir',
-                    visible:false
+                    title:'LineStyle',
+                    field:'LineStyle',
+                    visible:true
                 },
                 {
-                    title:'Monitor_status',
-                    field:'Monitor_status'
-                },
-                {
-                    title:'FetchSizeOfOneTime',
-                    field:'FetchSizeOfOneTime'
-                },
-                {
-                    title:'FetchFrequency',
-                    field:'FetchFrequency',
-                    sortable:true
-                },
-                {
-                    title:'TrainingFrequency',
-                    field:'TrainingFrequency',
-                    sortable:true
-                },
-                {
-                    title:'Description',
-                    field:'Description'
+                    title:'Marker',
+                    field:'Marker',
+                    visible:true
                 },
                 {
                     field: 'operate',
@@ -199,17 +152,17 @@
 
     //增加按钮事件
     $('#btn_add').click(function(){
-         $(location).prop('href', '{% url 'LogCollection:AddNewJobPage' %}')
+         $(location).prop('href', '{% url 'LogAnalysisPage:AddModelPage' %}')
     })
 
     function operateFormatter(value, row, index) {//赋予的参数
         return [
-            '<form method="post" action="{% url 'LogCollection:JobEditPage' %}">',
-                '<input type="hidden" name="job_name" value="' + row.Name + '">',
-                '<input type="submit" name="Edit" value="Edit" class="btn btn-link">',
-            '</form>',
-            '<form method="post" action="{% url 'LogCollection:JobDelete' %}">',
-                '<input type="hidden" name="job_name" value="' + row.Name + '">',
+{#            '<form method="post" action="{% url 'LogCollection:JobEditPage' %}">',#}
+{#                '<input type="hidden" name="job_name" value="' + row.Name + '">',#}
+{#                '<input type="submit" name="Edit" value="Edit" class="btn btn-link">',#}
+{#            '</form>',#}
+            '<form method="post" action="{% url 'LogAnalysisPage:DeleteModel' %}">',
+                '<input type="hidden" name="model_name" value="' + row.Name + '">',
                 '<input type="submit" name="Delete" value="Delete" class="btn btn-link">',
             '</form>',
     {#        '<a class="btn active" href="#">Delete</a>',#}
@@ -245,46 +198,6 @@
                     }else {
                         alert("Delete failed");
                         $('#mytab').bootstrapTable('refresh', {url: '/LogCollection/Joblist/'});
-                    }
-                }
-            });
-        }
-        return false;
-    });
-
-    //启动scheduler事件按钮
-    $('#start_btn').click(function(){
-        if(confirm('Are you sure to start scheduler?')){
-            $.ajax({
-                type:'post',
-                traditional :true,
-                url:'{% url 'LogCollection:schedulerStart' %}',
-                dataType: 'json',
-                success:function(data){
-                    if(data.status == 'success'){
-                        alert("Scheduler start success");
-                    }else {
-                        alert("Scheduler start failed");
-                    }
-                }
-            });
-        }
-        return false;
-    });
-
-    //停止scheduler事件按钮
-    $('#stop_btn').click(function(){
-        if(confirm('Are you sure to stop scheduler?')){
-            $.ajax({
-                type:'post',
-                traditional :true,
-                url:'{% url 'LogCollection:schedulerStop' %}',
-                dataType: 'json',
-                success:function(data){
-                    if(data.status == 'success'){
-                        alert("Scheduler stop success");
-                    }else {
-                        alert("Scheduler stop failed");
                     }
                 }
             });

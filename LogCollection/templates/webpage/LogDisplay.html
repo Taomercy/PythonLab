@@ -1,90 +1,128 @@
 {% extends "./base.html" %}
 {% block content %}
 
-    <form action="{% url 'LogCollection:LogSelect' %}" method="post" class="form-inline" role="form" >
-        <div class="form-group">
-            <label class="sr-only" for="log_name_condition">log_name_condition</label>
-            <input type="text" class="form-control" id="log_name_condition"  name="log_name_condition" placeholder="log_name_condition">
-        </div>
-        <select class="form-control" name="team_condition">
-            <option id="team" value="">Select team</option>
-            {% for team in Teams %}
-                <option id="team" value="{{team.name}}">{{team.name}}</option>
-            {% endfor %}
-        </select>
-        <select class="form-control" name="error_type_condition">
-            <option id="error" value="">Select error type</option>
-            {% for error in ErrorTypes %}
-                <option id="error" value="{{error.name}}">{{error.name}}</option>
-            {% endfor %}
-        </select>
-        <select class="form-control" name="exit_status_condition">
-            <option id="exit_status" value="">exit_status_condition</option>
-            {% for stat in Status %}
-                <option id="stat" value="{{stat.name}}">{{stat.name}}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Filter</button>
-    </form>
-
-
-    <div>
-        <table class="table table-striped table-bordered">
-            <caption>Log Display</caption>
-            <thead>
-                <tr>
-                    {% for th in theader %}
-                        <th>
-                            <strong>{{ th }}</strong>
-                        </th>
+    <div class="search panel panel-default">
+        <div class="panel-body form-group" style="margin-bottom:10px;">
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="log_name"  name="log_name_condition" placeholder="log_name">
+            </div>
+            <div class="col-sm-2">
+                <select class="form-control" id="team" name="team">
+                    <option id="team" value="">Select team</option>
+                    {% for team in Teams %}
+                        <option id="team" value="{{team.name}}">{{team.name}}</option>
                     {% endfor %}
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in logs %}
-                <tr>
-                    <td class="col-sm-2">
-                        <form method="post" action="{% url 'LogCollection:LogTextPage' %}">
-                            <input type="hidden" name="log_name" value="{{ log.name }}">
-                            <input type="submit" name="submit" value="{{ log.name }}" class="btn btn-link">
-                        </form>
-                    </td>
-                    <td class="col-sm-2">{{ log.team|default_if_none:'' }}</td>
-                    <td class="col-sm-2">{{ log.error_type }}</td>
-                    <td class="col-sm-2">{{ log.exit_status.name }}</td>
-                    <td class="col-sm-2">{{ log.codes_number }}</td>
-                    <td class="col-sm-2">{{ log.istrainingset }}</td>
-                    <td class="col-sm-2">{{ log.description|default_if_none:'' }}</td>
-                    <td>
-                        <form method="post" action="{% url 'LogCollection:LogEditPage' %}">
-                            <input type="hidden" name="log_name" value="{{ log.name }}">
-                            <input type="submit" name="submit" value="edit" class="btn btn-link">
-                        </form>
-                    </td>
-                    <td>
-                        <form method="post" action="{% url 'LogCollection:LogDelete' %}">
-                            <input type="hidden" name="log_name" value="{{ log.name }}">
-                            <input type="submit" name="submit" value="delete" class="btn btn-link">
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <select class="form-control" id="errorType" name="error_type">
+                    <option id="error" value="">Select error type</option>
+                    {% for error in ErrorTypes %}
+                        <option id="error" value="{{error.name}}">{{error.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <select class="form-control" id="exitStatus" name="exit_status">
+                    <option id="exit_status" value="">exit_status_condition</option>
+                    {% for stat in Status %}
+                        <option id="stat" value="{{stat.name}}">{{stat.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-primary" id="search_btn">Filter</button>
+                <button class="btn btn-primary" id="search_clear">Clear</button>
+            </div>
+        </div>
     </div>
 
-    <p>logs number = {{ logs_number }}</p>
 
-    {% if messages %}
-        <script>
-            {% for msg in messages %}
-                alert('{{ msg.message }}');
-            {% endfor %}
-        </script>
-    {% endif %}
+{#    <form method="post" class="form-inline" role="form" >#}
+{#        <div class="form-group">#}
+{#            <label class="sr-only" for="log_name_condition">log_name_condition</label>#}
+{#            <input type="text" class="form-control" id="log_name_condition"  name="log_name_condition" placeholder="log_name_condition">#}
+{#        </div>#}
+{#        <select class="form-control" name="team_condition">#}
+{#            <option id="team" value="">Select team</option>#}
+{#            {% for team in Teams %}#}
+{#                <option id="team" value="{{team.name}}">{{team.name}}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#        <select class="form-control" name="error_type_condition">#}
+{#            <option id="error" value="">Select error type</option>#}
+{#            {% for error in ErrorTypes %}#}
+{#                <option id="error" value="{{error.name}}">{{error.name}}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#        <select class="form-control" name="exit_status_condition">#}
+{#            <option id="exit_status" value="">exit_status_condition</option>#}
+{#            {% for stat in Status %}#}
+{#                <option id="stat" value="{{stat.name}}">{{stat.name}}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#        <button type="submit">Filter</button>#}
+{#        <button class="btn btn-primary" id="search_btn">Filter</button>#}
+{#        <button class="btn btn-primary" id="search_clear">Clear</button>#}
+{#    </form>#}
 
+    <div id="toolbar" class="btn-group pull-right" style="margin-right: 20px;">
+         <button id="btn_delete" type="button" class="btn btn-default" style="display: block">
+             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Delete
+         </button>
+    </div>
+    <table id="mytab"></table>
+
+{#    <div>#}
+{#        <table class="table table-striped table-bordered">#}
+{#            <caption>Log Display</caption>#}
+{#            <thead>#}
+{#                <tr>#}
+{#                    {% for th in theader %}#}
+{#                        <th>#}
+{#                            <strong>{{ th }}</strong>#}
+{#                        </th>#}
+{#                    {% endfor %}#}
+{#                    <th>Edit</th>#}
+{#                    <th>Delete</th>#}
+{#                </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#                {% for log in logs %}#}
+{#                <tr>#}
+{#                    <td class="col-sm-2">#}
+{#                        <form method="post" action="{% url 'LogCollection:LogTextPage' %}">#}
+{#                            <input type="hidden" name="log_name" value="{{ log.name }}">#}
+{#                            <input type="submit" name="submit" value="{{ log.name }}" class="btn btn-link">#}
+{#                        </form>#}
+{#                    </td>#}
+{#                    <td class="col-sm-2">{{ log.team|default_if_none:'' }}</td>#}
+{#                    <td class="col-sm-2">{{ log.error_type }}</td>#}
+{#                    <td class="col-sm-2">{{ log.exit_status.name }}</td>#}
+{#                    <td class="col-sm-2">{{ log.codes_number }}</td>#}
+{#                    <td class="col-sm-2">{{ log.istrainingset }}</td>#}
+{#                    <td class="col-sm-2">{{ log.duration }}</td>#}
+{#                    <td class="col-sm-2">{{ log.timestamp }}</td>#}
+{#                    <td class="col-sm-2">{{ log.description|default_if_none:'' }}</td>#}
+{#                    <td>#}
+{#                        <form method="post" action="{% url 'LogCollection:LogEditPage' %}">#}
+{#                            <input type="hidden" name="log_name" value="{{ log.name }}">#}
+{#                            <input type="submit" name="submit" value="edit" class="btn btn-link">#}
+{#                        </form>#}
+{#                    </td>#}
+{#                    <td>#}
+{#                        <form method="post" action="{% url 'LogCollection:LogDelete' %}">#}
+{#                            <input type="hidden" name="log_name" value="{{ log.name }}">#}
+{#                            <input type="submit" name="submit" value="delete" class="btn btn-link">#}
+{#                        </form>#}
+{#                    </td>#}
+{#                </tr>#}
+{#                {% endfor %}#}
+{#            </tbody>#}
+{#        </table>#}
+{#    </div>#}
+{##}
+{#    <p>logs number = {{ logs_number }}</p>#}
 
     <form class="form-inline" role="form" action="{% url 'LogCollection:SelectedLogsUpdateErrorTypes' %}" method="post">
         <div>
@@ -106,4 +144,215 @@
     </form>
 <br/><br/><br/><br/>
 
+{% endblock %}
+
+{% block script %}
+    $(function () {
+        //根据窗口调整表格高度
+        $(window).resize(function() {
+            $('#mytab').bootstrapTable('resetView', {
+                height: tableHeight()
+            })
+        })
+        //1.初始化Table
+        var oTable = new TableInit();
+        oTable.Init();
+     });
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#mytab').bootstrapTable({
+                url: '/LogCollection/LogSelect/',         //请求后台的URL（*）
+                method: 'post',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                queryParamsType: 'limit',
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 4,                       //每页的记录行数（*）
+                pageList: [4, 5, 10, 25, 50, 100],        //可供选择的每页的行数（*）
+               // search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                contentType: "application/x-www-form-urlencoded",
+                strictSearch: true,
+                showColumns: true,                  //是否显示所有的列
+                showRefresh: true,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+               // height: 700,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "no",                     //每一行的唯一标识，一般为主键列
+                showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                clickToSelect: true,//是否启用点击选中行
+                toolbarAlign:'right',
+                buttonsAlign:'right',//按钮对齐方式
+                columns:[
+                {
+                    title:'全选',
+                    field:'select',
+                    checkbox:true,
+                    width:25,
+                    align:'center',
+                    valign:'middle'
+                },
+                {
+                    title:'name',
+                    field:'name',
+                    visible:true
+                },
+                {
+                    title:'job',
+                    field:'job',
+                    visible:false
+                },
+                {
+                    title:'team',
+                    field:'team',
+                    visible:false
+                },
+                {
+                    title:'codes_number',
+                    field:'codes_number'
+                },
+                {
+                    title:'istrainingset',
+                    field:'istrainingset'
+                },
+                {
+                    title:'exit_status',
+                    field:'exit_status',
+                    sortable:true
+                },
+                {
+                    title:'error_type',
+                    field:'error_type',
+                    sortable:true
+                },
+                {
+                    title:'duration',
+                    field:'duration',
+                    sortable:true
+                },
+                {
+                    title:'timestamp',
+                    field:'timestamp',
+                    sortable:true
+                },
+                {
+                    title:'description',
+                    field:'description',
+                    visible:false
+                },
+                {
+                    field: 'operate',
+                    title: 'Operate',
+                    formatter: operateFormatter //自定义方法，添加操作按钮
+                }
+                ],
+                rowStyle: function (row, index) {
+                    var classesArr = ['success', 'info'];
+                    var strclass = "";
+                    if (index % 2 === 0) {//偶数行
+                        strclass = classesArr[0];
+                    } else {//奇数行
+                        strclass = classesArr[1];
+                    }
+                    return { classes: strclass };
+                },//隔行变色
+            });
+        };
+        //得到查询的参数
+        oTableInit.queryParams = function (params) {
+            var log_name = $("#log_name").val();
+            var exitStatus = $("#exitStatus").val();
+            var team = $("#team").val();
+            var errorType = $("#errorType").val();
+            var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                limit: params.limit,   //页面大小
+                offset:params.offset,
+                log_name:log_name,
+                team:team,
+                error_type:errorType,
+                exit_status:exitStatus,
+            };
+            return temp;
+        };
+        return oTableInit;
+    };
+
+    //查询按钮事件
+    $('#search_btn').click(function(){
+        $('#mytab').bootstrapTable('refresh',{
+            url: '/LogCollection/LogSelect/',
+            pageNumber:1
+        });
+    })
+
+    //Clear the search contation
+    $('#search_clear').click(function(){
+        $("#log_name").val('');
+        $("#exitStatus").val('');
+        $("#team").val('');
+        $("#errorType").val('');
+    })
+
+    function operateFormatter(value, row, index) {//赋予的参数
+        name = row.name;
+        var row = row
+        return [
+{#            '<form method="post" action="{% url 'LogCollection:LogEditPage' %}">',#}
+{#                '<input type="hidden" name="log_name" value="' + row.name + '">',#}
+{#                '<input type="submit" name="submit" value="edit" class="btn btn-link">',#}
+{#            '</form>',#}
+{#            '<form method="post" action="{% url 'LogCollection:LogDelete' %}">',#}
+{#                '<input type="hidden" name="log_name" value="' + row.name + '">',#}
+{#                '<input type="submit" name="Delete" value="Delete" class="btn btn-link">',#}
+{#            '</form>',#}
+            '<a class="btn active" href="{% url 'LogCollection:LogTextPage' %}?log_name=' + row.name + '">Details</a>',
+            '<a class="btn active" href="{% url 'LogCollection:LogEditPage' %}?log_name=' + row.name + '">Edit</a>',
+            '<a class="btn active" href="{% url 'LogCollection:LogDelete' %}?log_name=' + row.name + '">Delete</a>',
+    {#        '<a class="btn btn-default" href="#">记录</a>',#}
+    {#        '<a class="btn active" href="#">准入</a>'#}
+        ].join('');
+    }
+
+    function tableHeight() {
+        return $(window).height() - 140;
+    }
+
+    //删除事件按钮
+    $('#btn_delete').click(function(){
+    	var dataArr=$('#mytab').bootstrapTable('getSelections');
+    	var name=[];
+        for(var i=0; i < dataArr.length; i++){
+            name[i]=dataArr[i].name;
+        }
+        if(name.length<=0){ alert('You have not select the jobs to be deleted！');return;   }
+        if(confirm('Are you sure to delete?')){
+            $.ajax({
+                type:'post',
+                traditional :true,
+                url:'{% url 'LogCollection:LogsDelete' %}',
+                data:{'logs_name':name},
+                dataType: 'json',
+                success:function(data){
+                    if(data.status == 'success'){
+                        alert("Delete success");
+                        $('#mytab').bootstrapTable('refresh', {url: '/LogCollection/LogSelect/'});
+                    }else {
+                        alert("Delete failed");
+                        $('#mytab').bootstrapTable('refresh', {url: '/LogCollection/LogSelect/'});
+                    }
+                }
+            });
+        }
+        return false;
+    });
 {% endblock %}

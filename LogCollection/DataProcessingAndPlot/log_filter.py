@@ -32,8 +32,9 @@ def filter_error(context):
 
 def re_error(line):
     res = 0
-    if    re.search(r'error:', line, re.M | re.I) or\
+    if re.search(r'error:', line, re.M | re.I) or\
             re.search(r'cannot', line, re.M | re.I) or \
+            re.search(r'exception:', line, re.M | re.I) or \
             re.search(r'failed', line, re.M | re.I) or \
             re.search(r'Permission denied', line, re.M | re.I) or \
             re.search(r'marked build as failure', line, re.M | re.I) or \
@@ -49,3 +50,18 @@ def get_key_log(filename):
     for i in outputs:
         filter_log.append(context[i])
     return filter_log
+
+
+def log_filter(log):
+    result = []
+    lines = log.split('\n')
+    for line in lines:
+        if re.search(r'error:', line, re.M | re.I) or \
+                re.search(r'cannot', line, re.M | re.I) or \
+                re.search(r'failed', line, re.M | re.I) or \
+                re.search(r'exception:', line, re.M | re.I) or \
+                re.search(r'Permission denied', line, re.M | re.I) or \
+                re.search(r'marked build as failure', line, re.M | re.I) or \
+                re.search(r'No such file or directory', line, re.M | re.I):
+            result.append(line)
+    return '\n'.join(result)

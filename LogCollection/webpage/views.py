@@ -15,7 +15,16 @@ import json
 from django.core.paginator import Paginator
 # Create your views here.
 global filter_logs
-
+for job in Job.objects.all():
+    old_path = job.job_dir
+    if old_path.split('LogSavingPath')[0] != home_path:
+        new_path = os.path.join(home_path, 'LogSavingPath', old_path.split('LogSavingPath')[-1][1:])
+        try:
+            shutil.move(old_path, new_path)
+        except Exception as e:
+            print e
+        job.job_dir = new_path
+        job.save()
 
 
 def homepage(request):
@@ -64,7 +73,7 @@ def search_all_logs():
 
 def get_all_select():
     context = {}
-    theader = ['Log Name', 'Team', 'ErrorType', 'Exit Status', 'Codes Number', 'Is training set', 'Description']
+    theader = ['Log Name', 'Team', 'ErrorType', 'Exit Status', 'Codes Number', 'Is training set', 'Duration', 'Timestamp', 'Description']
     context['theader'] = theader
     context['Teams'] = Team.objects.all()
     context['ErrorTypes'] = ErrorType.objects.all()
@@ -228,8 +237,8 @@ def get_jenkins_log(request):
         team = request.POST.get('team', None)
         error_type = request.POST.get('error_type', "")
         description = request.POST.get('description', "")
-        job_url = JobUrlModel(url)
-        if not job_url.save(scheduler=False, team_name=team, error_type=error_type, description=description):
+        build = JobBuild(url)
+        if not build.save(scheduler=False, team_name=team, error_type=error_type, description=description):
             messages.success(request, "哈哈哈哈，上传成功啦!")
         else:
             messages.error(request, "哦哟， 失败了呀！")
@@ -249,27 +258,9 @@ def get_jenkins_log_by_build_num_internal(request):
             threadLock = threading.Lock()
             # print "Starting thread [%d]" % self.threadID
             print "fetching log:", self.url
-            job_url = JobUrlModel(self.url)
-            log_name = job_url.get_log_name()
-            if Log.objects.filter(name=log_name):
-                print "[%s] the log has been exist" % log_name
-                return 1
-
+            build = JobBuild(self.url)
             threadLock.acquire()
-            if job_url.save_console_text():
-                print "[%s] save log fail" % log_name
-                threadLock.release()
-                return 2
-            else:
-                print "[%s] console log saved" % log_name
-
-            log = Log.objects.create(name=log_name,
-                                     job=Job.objects.get(name=job_url.get_job_name()),
-                                     codes_number=job_url.get_codes_num(),
-                                     istrainingset=False,
-                                     exit_status=ExitStatus.objects.get(name=job_url.stat),
-                                     description=description)
-            log.save()
+            build.save(scheduler=True)
             threadLock.release()
             # print "Exiting thread [%d]" % self.threadID
 
@@ -357,8 +348,8 @@ def ErrorTypeEditSubmit(request):
 
 
 def LogDelete(request):
-    if request.method == "POST":
-        log_name = request.POST.get('log_name', None)
+    if request.method == "GET":
+        log_name = request.GET.get('log_name', None)
         if log_name is None:
             raise Http404("The log name is None")
 
@@ -383,10 +374,30 @@ def LogDelete(request):
     return render(request, 'webpage/LogDisplay.html', context=context)
 
 
+def LogsDelete(request):
+    if request.method == "POST":
+        logs_name = request.POST.getlist("logs_name")
+        for log_name in logs_name:
+            if log_name is None:
+                raise Http404("The log name is None")
+            try:
+                os.remove(Log.objects.get(name=log_name).get_log_path())
+                Log.objects.get(name=log_name).delete()
+            except:
+                logs = Log.objects.filter(name=log_name)
+                for log in logs:
+                    try:
+                        os.remove(log.get_log_path()())
+                    except Exception as e:
+                        print e
+                    print "%s has been deleted" % log_name
+                logs.delete()
+    return HttpResponse('{"status":"success"}', content_type='application/json')
+
 def LogEditPage(request):
     context = {}
-    if request.method == "POST":
-        log_name = request.POST.get('log_name', None)
+    if request.method == "GET":
+        log_name = request.GET.get('log_name', None)
         try:
             log = Log.objects.get(name=log_name)
         except:
@@ -423,8 +434,8 @@ def LogEditSubmit(request):
 
 def LogTextPage(request):
     context = search_all_logs()
-    if request.method == "POST":
-        log_name = request.POST.get('log_name', None)
+    if request.method == "GET":
+        log_name = request.GET.get('log_name', None)
         log_path = Log.objects.get(name=log_name).get_log_path()
         with open(log_path, 'r') as fr:
             log_txt = fr.readlines()
@@ -440,12 +451,44 @@ def LogTextPage(request):
 
 
 def LogSelect(request):
+    def tableData(request, dataList):
+        if request.method == "POST":
+            limit = request.POST.get('limit')  # how many items per page
+            offset = request.POST.get('offset')  # how many items in preview pages
+
+            if dataList:
+                response_data = {'total': dataList.count(), 'rows': []}
+                if not offset:
+                    offset = 0
+                if not limit:
+                    limit = 10
+                page = int(int(offset) / int(limit) + 1)
+                pageinator = Paginator(dataList, limit)  # 开始做分页
+                data = pageinator.page(page)
+
+                for log in data:
+                    response_data['rows'].append({
+                        "name": log.name,
+                        "job": str(log.job),
+                        "team": str(log.team),
+                        "codes_number": log.codes_number,
+                        "istrainingset": log.istrainingset,
+                        "exit_status": str(log.exit_status),
+                        "error_type": str(log.error_type),
+                        "duration": log.duration,
+                        "timestamp": log.timestamp,
+                        "description": log.description,
+                    })
+                return HttpResponse(json.dumps(response_data))  # 需要json处理下数据格式
+            else:
+                return HttpResponse(json.dumps({'total': 0, 'rows': []}))
+    logs = []
     context = get_all_select()
     if request.method == "POST":
-        log_name_condition = request.POST.get('log_name_condition', None)
-        team_condition = request.POST.get('team_condition', None)
-        error_type_condition = request.POST.get('error_type_condition', None)
-        exit_status_condition = request.POST.get('exit_status_condition', None)
+        log_name_condition = request.POST.get('log_name', None)
+        team_condition = request.POST.get('team', None)
+        error_type_condition = request.POST.get('error_type', None)
+        exit_status_condition = request.POST.get('exit_status', None)
         logs = Log.objects.all()
 
         if log_name_condition:
@@ -461,8 +504,8 @@ def LogSelect(request):
         filter_logs = logs
         context['logs'] = logs
         context['logs_number'] = len(logs)
-
-    return render(request, 'webpage/LogDisplay.html', context=context)
+    return tableData(request, logs)
+    # return render(request, 'webpage/LogDisplay.html', context=context)
 
 
 def SelectedLogsUpdateErrorTypes(request):
@@ -484,7 +527,7 @@ def SelectedLogsDelete(request):
     global filter_logs
     for log in filter_logs:
         try:
-            os.remove(Log.objects.get(name=log.name).get_log_path()())
+            os.remove(Log.objects.get(name=log.name).get_log_path())
             log.delete()
         except:
             log.delete()
@@ -496,13 +539,41 @@ def SelectedLogsDelete(request):
 
 
 def SchedulerPage(request):
-    context = search_all_jobs()
-    jobs = Job.objects.all()
-    context['jobs'] = jobs
-    return render(request, 'webpage/Scheduler.html', context=context)
+    return render(request, 'webpage/Scheduler.html')
 
 
 def Joblist(request):
+    def tableData(request, dataList):
+        if request.method == "POST":
+            limit = request.POST.get('limit')  # how many items per page
+            offset = request.POST.get('offset')  # how many items in total in the DB
+            # jobs = Job.objects.all()
+
+            if dataList:
+                response_data = {'total': dataList.count(), 'rows': []}
+                if not offset:
+                    offset = 0
+                if not limit:
+                    limit = 10
+                page = int(int(offset) / int(limit) + 1)
+                pageinator = Paginator(dataList, limit)  # 开始做分页
+                data = pageinator.page(page)
+
+                for job in data:
+                    response_data['rows'].append({
+                        "Name": job.name,
+                        "Url": job.url,
+                        "Log_dir": job.job_dir,
+                        "Monitor_status": job.ismonitored,
+                        "FetchSizeOfOneTime": job.fetchSizeOfOneTime,
+                        "FetchFrequency": job.fetchFrequency,
+                        "TrainingFrequency": job.trainingFrequency,
+                        "Description": job.description,
+                    })
+                return HttpResponse(json.dumps(response_data))  # 需要json处理下数据格式
+            else:
+                return HttpResponse(json.dumps({'total': 0, 'rows': []}))
+    jobs = []
     if request.method == "POST":
         name = request.POST.get('job_name')
         status = request.POST.get('monitor_status')
@@ -533,6 +604,9 @@ def SaveNewJob(request):
         fetchFrequency = int(request.POST.get('fetchFrequency', None))
         trainingFrequency = int(request.POST.get('trainingFrequency', None))
         description = request.POST.get('description', "")
+        startNow = request.POST.get('startNow', None)
+        startNow = True if startNow.lower() == 'true' else False
+        jobFetchSizeForStartNow = request.POST.get('jobFetchSizeForStartNow', None)
 
         if Job.objects.filter(name=name):
             messages.success(request, "the job is exist")
@@ -542,10 +616,13 @@ def SaveNewJob(request):
         if not os.path.exists(job_dir):
             os.makedirs(job_dir)
         Job.objects.create(name=name, url=url, job_dir=job_dir, ismonitored=ismonitored,
-                                 fetchSizeOfOneTime=fetchSizeOfOneTime, fetchFrequency=fetchFrequency, trainingFrequency=trainingFrequency, description=description).save()
+                           fetchSizeOfOneTime=fetchSizeOfOneTime, fetchFrequency=fetchFrequency,
+                           trainingFrequency=trainingFrequency, description=description).save()
         messages.success(request, "create new scedule job success!")
         job = Job.objects.get(name=name)
-        Fsche.job_scheduler_add(job)
+        if startNow:
+            job.fetchSizeOfOneTime = jobFetchSizeForStartNow
+        Fsche.job_scheduler_add(job, start_now=startNow)
         Tsche.job_scheduler_add(job)
     return render(request, 'webpage/Scheduler.html', context=search_all_error_type())
 
@@ -589,39 +666,6 @@ def JobsDelete(request):
                 return HttpResponse('{"status":"failed"}', content_type='application/json')
         messages.success(request, "delete success!")
     return HttpResponse('{"status":"success"}', content_type='application/json')
-
-
-def tableData(request, dataList):
-    if request.method == "POST":
-        print(request.POST)
-        limit = request.POST.get('limit')  # how many items per page
-        offset = request.POST.get('offset')  # how many items in total in the DB
-        # jobs = Job.objects.all()
-
-        if dataList:
-            response_data = {'total': dataList.count(), 'rows': []}
-            if not offset:
-                offset = 0
-            if not limit:
-                limit = 10
-            page = int(int(offset) / int(limit) + 1)
-            pageinator = Paginator(dataList, limit)  # 开始做分页
-            data = pageinator.page(page)
-
-            for job in data:
-                response_data['rows'].append({
-                    "Name" : job.name,
-                    "Url" : job.url,
-                    "Log_dir" : job.job_dir,
-                    "Monitor_status" : job.ismonitored,
-                    "FetchSizeOfOneTime" : job.fetchSizeOfOneTime,
-                    "FetchFrequency" : job.fetchFrequency,
-                    "TrainingFrequency": job.trainingFrequency,
-                    "Description" : job.description,
-                })
-            return  HttpResponse(json.dumps(response_data))    # 需要json处理下数据格式
-        else:
-            return HttpResponse(json.dumps({'total': 0, 'rows': []}))
 
 
 def JobEditPage(request):
@@ -672,3 +716,23 @@ def JobEditSubmit(request):
     context['jobs'] = jobs
 
     return render(request, 'webpage/Scheduler.html', context=context)
+
+
+def schedulerStart(request):
+    try:
+        Fsche.scheduler_start()
+        Tsche.scheduler_start()
+    except Exception as e:
+        messages.error(request, e)
+        return HttpResponse('{"status":"failed"}', content_type='application/json')
+    return HttpResponse('{"status":"success"}', content_type='application/json')
+
+
+def schedulerStop(request):
+    try:
+        Fsche.scheduler_shutdown(wait=False)
+        Tsche.scheduler_shutdown(wait=False)
+    except Exception as e:
+        messages.error(request, e)
+        return HttpResponse('{"status":"failed"}', content_type='application/json')
+    return HttpResponse('{"status":"success"}', content_type='application/json')

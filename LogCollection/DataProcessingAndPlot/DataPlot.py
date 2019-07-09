@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from DataPrepare import *
+from DataProcessingAndPlot.DataPrepare import *
 from LogAnalysis.models import ScoreStatistic
 import platform
 sysstr = platform.system()
@@ -10,6 +10,7 @@ if sysstr == 'Linux':
 import matplotlib.pyplot as plt
 from LogCollection.settings import STATIC_ROOT
 from mpl_toolkits.mplot3d import Axes3D
+from common.TimeUtils import timestamp2time
 
 
 def visual_2D_dataset(dataset_X, dataset_Y, fig_title='The doc2vec labels', fig_name='doc2vec_2d.png'):
@@ -123,7 +124,6 @@ def bar_plot_codes_stat(job):
 
     stat_n = len(stat)
     total_width = 0.8
-    width = total_width / stat_n
 
     for i in range(stat_n):
         cn_tmp = []
@@ -146,41 +146,111 @@ def bar_plot_codes_stat(job):
     return fig_name
 
 
-def scores_statistic_plot(job_name, model=None, fig_name=None):
-    scores = ScoreStatistic.objects.filter(job__name=job_name)
+def timestamp_duration_plot(job, time_start=None):
+    if time_start is None:
+        logs = Log.objects.filter(job=job).order_by('-timestamp')
+    else:
+        logs = Log.objects.filter(job=job, timestamp__gt=time_start).order_by('-timestamp')
+    if not logs:
+        raise Exception("No builds!")
+
+    timestamps = [log.timestamp for log in logs]
+    durations = [log.duration for log in logs]
+    code_nums = [log.codes_number for log in logs]
+
+    fig = plt.figure(figsize=(10, 5))
+    ax1 = fig.add_subplot(2, 1, 1)
+    ax2 = fig.add_subplot(2, 1, 2)
+    ax1.plot(timestamps, durations, label='duration', linestyle='-', linewidth=1, color='black')
+    ax2.plot(timestamps, code_nums, label='code nums', linestyle=':', linewidth=1, color='black')
+
+    for stat in ExitStatus.objects.all():
+        points = []
+        for log in logs:
+            if log.exit_status == stat:
+                points.append(log)
+        timestamps = [int(point.timestamp) for point in points]
+        durations = [point.duration for point in points]
+        code_nums = [point.codes_number for point in points]
+        param = {'color': stat.color, 'marker': 'o', 'label': stat.name}
+        ax1.scatter(timestamps, durations, **param)
+        ax2.scatter(timestamps, code_nums, **param)
+
+    fig.suptitle(job.name)
+    ax1.grid(True)
+    ax2.grid(True)
+    ax1.set_ylabel("duration")
+    ax2.set_ylabel("code nums")
+    ax2.set_xlabel("timestamp")
+    ax1.legend(loc='upper left')
+    ax2.legend(loc='lower left')
+    fig_name = "data_for_%s.png" % job.name
+    plot_path = os.path.join(STATIC_ROOT, 'DataPlot', fig_name)
+    fig.savefig(plot_path)
+    print "saving the plot %s" % plot_path
+    plt.close()
+    return fig_name
+
+
+def scores_statistic_plot(job_name, time_start=None, model=None, fig_name=None):
+    if time_start is None:
+        scores = ScoreStatistic.objects.filter(job__name=job_name)
+    else:
+        scores = ScoreStatistic.objects.filter(job__name=job_name, training_time__gt=time_start)
     if not scores:
         raise Exception("Table ScoreStatistic is empty!")
     if model:
         models = [model]
     else:
         models = list(set([score.model for score in scores]))
-    fig = plt.figure(figsize=(11, 6))
+    fig = plt.figure(figsize=(12, 8))
     title = "[%s] score statistic" % job_name
     fig.suptitle(title)
 
-    ax1 = fig.add_subplot(2, 1, 1)
+    ax1 = fig.add_subplot(3, 1, 1)
     ax1.grid(True)
-    ax1.set_ylabel("score")
+    ax1.set_ylabel("accurary")
 
-    ax2 = fig.add_subplot(2, 1, 2)
+    ax2 = fig.add_subplot(3, 1, 2)
     ax2.grid(True)
     ax2.set_xlabel("training time")
-    ax2.set_ylabel("data counts")
+    ax2.set_ylabel("duration")
+
+    ax3 = fig.add_subplot(3, 1, 3)
+    ax3.grid(True)
+    ax3.set_xlabel("training time")
+    ax3.set_ylabel("data counts")
 
     times_a = None
     data_count = None
     for index in range(len(models)):
         model = models[index]
-        JScores = scores.filter(model=model).order_by('-training_time')
+        Model = MLModel.objects.get(name=model)
+        JScores = scores.filter(model=Model).order_by('-training_time')
         j_scores = np.array([score.score for score in JScores])
+        durations = np.array([score.duration for score in JScores])
         times = np.array([score.training_time for score in JScores])
         times_a = times
-        ax1.plot(times, j_scores, linewidth=1, linestyle='-', label=model)
+        param = {}
+        param['label'] = model
+        if Model.plot_color:
+            param['color'] = Model.plot_color.character
+        if Model.line_style:
+            param['linestyle'] = Model.line_style.character
+        if Model.line_width:
+            param['linewidth'] = Model.line_width
+        if Model.marker:
+            param['marker'] = Model.marker.character
+
+        ax1.plot(times, j_scores, **param)
+        ax2.plot(times_a, durations, **param)
 
         data_count = [score.dataset_num for score in JScores]
-    ax2.plot(times_a, data_count, linewidth=1.5, linestyle='-', color='red', label='data count')
+    ax1.legend(loc='lower right')
+    ax2.legend(loc='upper left')
 
-    fig.legend(loc='upper left')
+    ax3.plot(times_a, data_count, linewidth=1.5, linestyle='-', color='red', label='data count')
+    ax3.legend(loc='lower right')
 
     if not fig_name:
         fig_name = "%s_scores_statistic.png" % job_name

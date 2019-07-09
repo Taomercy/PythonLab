@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import os
-from DataPrepare import DocLogs
+from DataProcessingAndPlot.DataPrepare import DocLogs
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout, LSTM, Bidirectional
+from keras.layers import Dense, Activation, Dropout, LSTM
 from keras.layers.convolutional import MaxPooling1D, Conv1D
-from keras.callbacks import EarlyStopping
-from keras.models import load_model
-import pandas as pd
 import functools
 from keras import backend as K
 import tensorflow as tf

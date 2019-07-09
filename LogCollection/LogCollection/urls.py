@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^LogDisplay/', views.LogCollection, name='LogDisplay'),
     url(r'^LogCollection/', include('webpage.urls', namespace='LogCollection')),
     url(r'^LogAnalysisPage/', include('LogAnalysis.urls', namespace='LogAnalysisPage')),
+    url(r'^LogPredict/', include('LogPredict.urls', namespace='LogPredict')),
     #config the staticfile path
     url(r'^static/(?P<path>.*)$',serve,{'document_root': settings.STATIC_ROOT}),
 ]

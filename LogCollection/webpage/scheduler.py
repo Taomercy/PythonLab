@@ -15,7 +15,7 @@ def fetch_logs(job):
         u = build['url']
         print u
         try:
-            JobUrlModel(u).save(scheduler=True)
+            JobBuild(u).save(scheduler=True)
         except Exception as e:
             print e
             continue
@@ -24,23 +24,19 @@ def fetch_logs(job):
             break
 
 
-class FetchingSchedulerMain():
+class FetchingSchedulerMain(object):
     scheduler = None
 
-    def __init__(self, now_start=False):
+    def __init__(self):
         logging.basicConfig()
         logging.getLogger('apscheduler').setLevel(logging.DEBUG)
         self.scheduler = BackgroundScheduler()
-        self.scheduler.start()
-        jobs = Job.objects.filter(ismonitored=True)
-        for job in jobs:
-            if now_start:
-                self.scheduler.add_job(fetch_logs, args=[job])
-            self.scheduler.add_job(fetch_logs, 'interval', seconds=job.fetchFrequency, args=[job])
 
-    def job_scheduler_add(self, job):
+    def job_scheduler_add(self, job, start_now=False):
+        if start_now:
+            self.scheduler.add_job(fetch_logs, args=[job])
         if job.ismonitored:
-            self.scheduler.add_job(fetch_logs, 'interval', seconds=job.fetchFrequency, args=[job])
+            self.scheduler.add_job(fetch_logs, 'interval', seconds=job.fetchFrequency, args=[job], jitter=600)
             return 0
         return 1
 
@@ -63,6 +59,12 @@ class FetchingSchedulerMain():
             if task.args[0].name == job.name:
                 return 0
         return 1
+
+    def scheduler_start(self):
+        self.scheduler.start()
+        jobs = Job.objects.filter(ismonitored=True)
+        for job in jobs:
+            self.scheduler.add_job(fetch_logs, 'interval', seconds=job.fetchFrequency, args=[job], jitter=600)
 
     def scheduler_shutdown(self, wait=True):
         self.scheduler.shutdown(wait=wait)

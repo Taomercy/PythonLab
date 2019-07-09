@@ -1,9 +1,9 @@
 {% extends "./../webpage/base.html" %}
 {% block content %}
-    <h2 class="text-center">Schedule training report</h2>
+    <h2 class="text-center">Building statistic</h2>
     <div class="search panel panel-default" style="margin-bottom: 0">
         <div class="panel-body form-group" style="margin-bottom:0">
-            <form class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:ScoresStatistic' %}" method="post">
+            <form class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}" method="post">
                 <div class="form-group">
                     <label for="team" class="col-sm-2 control-label">Job Name</label>
                     <div class="col-sm-9">
@@ -14,22 +14,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="team" class="col-sm-2 control-label">Training model</label>
-                    <div class="col-sm-9">
-                        <select class="form-control" name="model">
-                            <option id="model" value="">All</option>
-                            {% for model in models %}
-                                {% for value in model.values %}
-                                    {% if value != 'K-means++' and value != 'K-means-DBSCAN' %}
-                                        <option id="model" value="{{ value }}">{{ value }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-
                 <div class="form-group" style="margin-bottom:0">
                     <div class="col-sm-offset-2 col-sm-9">
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -44,7 +28,15 @@
     <div style="overflow: auto; margin:20px" >
         {% for img in images %}
             <img src="{% static img %}">
-            <br/>
+            <br>
+            {% if images is not None %}
+            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneDay">One day</a>
+            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneWeek">One week</a>
+            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneMonth">One month</a>
+            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=ThreeMonth">Three month</a>
+            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneYear">One year</a>
+            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=All">All</a>
+        {% endif %}
         {% endfor %}
     </div>
 
