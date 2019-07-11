@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from common import *
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from sklearn.externals import joblib
-from DataProcessingAndPlot import log_filter
-from DataProcessingAndPlot.DataPrepare import get_all_files_in_the_dir
-from LogAnalysis.config import *
-from LogAnalysis.models import *
+from Untils.LogFilter import *
+from Untils.OsUntils import get_all_files_in_the_dir
 
 
 def trainning_log_data_set(dirname, class_from_database=True):
@@ -18,7 +14,6 @@ def trainning_log_data_set(dirname, class_from_database=True):
     m = len(trainingLogList)
     contexts = []
     for i in range(m):
-        logStr = ""
         logNameStr = os.path.basename(trainingLogList[i])
         if class_from_database:
             try:
@@ -27,13 +22,10 @@ def trainning_log_data_set(dirname, class_from_database=True):
                 print "%s gets error ==> [%s]" % (logNameStr, e)
                 os.remove(trainingLogList[i])
                 continue
-
         else:
             logClass = logNameStr.split('.')[0].split('_')[-1]
         logLabels.append(str(logClass))
-        logContextFilter = log_filter.get_key_log(trainingLogList[i])
-        for line in logContextFilter:
-            logStr += line
+        logStr = get_filter_log(trainingLogList[i])
         contexts.append(str(logStr))
     return contexts, logLabels
 
@@ -44,15 +36,9 @@ def test_log_data_set(dirname):
     contexts = []
     logNames = []
     for i in range(m):
-        logStr = ""
         logNameStr = os.path.basename(testLogList[i])
         logNames.append(logNameStr)
-        logContextFilter = log_filter.get_key_log(testLogList[i])
-        for line in logContextFilter:
-            try:
-                logStr += line
-            except:
-                continue
+        logStr = get_filter_log(testLogList[i])
         contexts.append(logStr)
     return contexts, logNames
 

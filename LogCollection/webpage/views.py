@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.http import Http404
+from django.shortcuts import render
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
-from django.shortcuts import render
-from models import *
-from config import *
-from django.contrib import messages
+import json
 import shutil
 import threading
 from LogCollection.views import Fsche, Tsche
-import json
-from django.core.paginator import Paginator
+from models import *
+from config import *
+
 # Create your views here.
 global filter_logs
 for job in Job.objects.all():

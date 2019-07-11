@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from webpage.models import JobBuild
-from DataProcessingAndPlot.log_filter import *
+from Untils.LogFilter import *
 
 # Create your views here.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from DataProcessingAndPlot.DataPrepare import *
+from DataProcessingAndPlot.DataProcessing import *
 from LogAnalysis.models import ScoreStatistic
 import platform
 sysstr = platform.system()
@@ -10,7 +10,6 @@ if sysstr == 'Linux':
 import matplotlib.pyplot as plt
 from LogCollection.settings import STATIC_ROOT
 from mpl_toolkits.mplot3d import Axes3D
-from common.TimeUtils import timestamp2time
 
 
 def visual_2D_dataset(dataset_X, dataset_Y, fig_title='The doc2vec labels', fig_name='doc2vec_2d.png'):
@@ -123,7 +122,6 @@ def bar_plot_codes_stat(job):
     fig = plt.figure(figsize=(12, 6))
 
     stat_n = len(stat)
-    total_width = 0.8
 
     for i in range(stat_n):
         cn_tmp = []
@@ -203,7 +201,7 @@ def scores_statistic_plot(job_name, time_start=None, model=None, fig_name=None):
         models = [model]
     else:
         models = list(set([score.model for score in scores]))
-    fig = plt.figure(figsize=(12, 8))
+    fig = plt.figure(figsize=(16, 8))
     title = "[%s] score statistic" % job_name
     fig.suptitle(title)
 
@@ -223,6 +221,7 @@ def scores_statistic_plot(job_name, time_start=None, model=None, fig_name=None):
 
     times_a = None
     data_count = None
+    flag = 0
     for index in range(len(models)):
         model = models[index]
         Model = MLModel.objects.get(name=model)
@@ -230,7 +229,6 @@ def scores_statistic_plot(job_name, time_start=None, model=None, fig_name=None):
         j_scores = np.array([score.score for score in JScores])
         durations = np.array([score.duration for score in JScores])
         times = np.array([score.training_time for score in JScores])
-        times_a = times
         param = {}
         param['label'] = model
         if Model.plot_color:
@@ -243,13 +241,17 @@ def scores_statistic_plot(job_name, time_start=None, model=None, fig_name=None):
             param['marker'] = Model.marker.character
 
         ax1.plot(times, j_scores, **param)
-        ax2.plot(times_a, durations, **param)
+        ax2.plot(times, durations, **param)
 
-        data_count = [score.dataset_num for score in JScores]
-    ax1.legend(loc='lower right')
-    ax2.legend(loc='upper left')
+        if flag == 0:
+            times_a = times
+            data_count = [score.dataset_num for score in JScores]
+            flag = 1
 
     ax3.plot(times_a, data_count, linewidth=1.5, linestyle='-', color='red', label='data count')
+
+    ax1.legend(loc='lower right')
+    ax2.legend(loc='upper left')
     ax3.legend(loc='lower right')
 
     if not fig_name:

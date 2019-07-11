@@ -7,7 +7,8 @@ urlpatterns = [
     url(r'^LogAnalysisPage/$', views.LogAnalysisPage, name='LogAnalysisPage'),
 
     url(r'^TrainingLogByNaiveBayes/$', views.TrainingLogByNaiveBayes, name='TrainingLogByNaiveBayes'),
-    url(r'^TrainingLogBySVMAndMLP/$', views.TrainingLogBySVMAndMLP, name='TrainingLogBySVMAndMLP'),
+    url(r'^TrainingLogByMLP/$', views.TrainingLogByMLP, name='TrainingLogByMLP'),
+    url(r'^TrainingLogBySVM/$', views.TrainingLogBySVM, name='TrainingLogBySVM'),
     url(r'^TrainingLogByKMeans/$', views.TrainingLogByKMeans, name='TrainingLogByKMeans'),
 
     url(r'^LogPredictPage/$', views.LogPredictPage, name='LogPredictPage'),

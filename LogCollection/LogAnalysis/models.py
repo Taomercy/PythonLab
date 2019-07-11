@@ -107,7 +107,11 @@ def InitMLModel():
     InitPlotColors()
     InitPlotLineStyles()
     InitPlotMarkers()
-    if not MLModel.objects.all():
+    if not MLModel.objects.filter(name='naive bayes'):
         MLModel.objects.create(name='naive bayes', plot_color_id=2, line_width=1, line_style_id=1)
+    if not MLModel.objects.filter(name='mlp'):
         MLModel.objects.create(name='mlp', plot_color_id=1, line_width=1, line_style_id=1)
+    if not MLModel.objects.filter(name='svm'):
         MLModel.objects.create(name='svm', plot_color_id=14, line_width=1, line_style_id=1)
+    if not MLModel.objects.filter(name='mlp+processing'):
+        MLModel.objects.create(name='mlp+processing', plot_color_id=4, line_width=1, line_style_id=3)

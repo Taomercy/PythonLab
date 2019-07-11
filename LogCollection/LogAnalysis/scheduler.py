@@ -5,7 +5,8 @@ import logging
 import time
 from webpage.models import *
 from AlgorithmModels.NaiveBayesModel import training_by_naive_bayes
-from AlgorithmModels.MLPClassifierModel import training_by_SVM_and_MLP
+from AlgorithmModels.MLPModel import training_by_MLP
+from AlgorithmModels.SVMModel import training_by_SVM
 global scheduler
 
 
@@ -13,7 +14,10 @@ def training_scheduler(job):
     print time.strftime('{%Y-%m-%d %H:%M:%S}', time.localtime(time.time()))
     print "%s training  start" % job.name
     training_by_naive_bayes(job.job_dir, job_name=job.name, scheduler=True)
-    training_by_SVM_and_MLP(job.job_dir, job_name=job.name, scheduler=True)
+    training_by_MLP(job.job_dir, job_name=job.name, scheduler=True)
+    training_by_SVM(job.job_dir, job_name=job.name, scheduler=True)
+    training_by_MLP(job.job_dir, job_name=job.name, scheduler=True, data_processing=True)
+    # training_by_SVM(job.job_dir, job_name=job.name, scheduler=True, data_processing=True)
     print "%s training  end" % job.name
 
 

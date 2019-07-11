@@ -60,12 +60,4 @@
     </form>
 
     {% csrf_token %}
-    {% if messages %}
-        <script>
-            {% for msg in messages %}
-                alert('{{ msg.message }}');
-            {% endfor %}
-        </script>
-    {% endif %}
-
 {% endblock %}

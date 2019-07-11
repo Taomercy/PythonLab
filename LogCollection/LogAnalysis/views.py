@@ -3,16 +3,17 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib import messages
-from AlgorithmModels.NaiveBayesModel import *
-from DataProcessingAndPlot.DataPrepare import *
-from AlgorithmModels.MLPClassifierModel import *
-from AlgorithmModels.KMeansModel import *
+from django.core.paginator import Paginator
+import json
 import threading
+from AlgorithmModels.NaiveBayesModel import *
+from AlgorithmModels.MLPModel import *
+from AlgorithmModels.KMeansModel import *
+from AlgorithmModels.SVMModel import *
+from DataProcessingAndPlot.DataProcessing import *
 from DataProcessingAndPlot.DataPlot import timestamp_duration_plot
 from DataProcessingAndPlot.DataPlot import scores_statistic_plot
-import json
-from django.core.paginator import Paginator
-from common.TimeUtils import *
+from Untils.TimeUtils import *
 
 # Create your views here.
 global plot_job
@@ -50,14 +51,31 @@ def TrainingLogByNaiveBayes(request):
         return render(request, 'LogAnalysis/LogAnalysisPage.html', context=context)
 
 
-def TrainingLogBySVMAndMLP(request):
+def TrainingLogByMLP(request):
     context = get_training_jobs()
     if request.method == "POST":
         training_job = request.POST.get('training_job', "")
         training_path = Job.objects.get(name=training_job).job_dir
         print "training_path:", training_path
         try:
-            context.update(training_by_SVM_and_MLP(training_path, job_name=training_job, feature_d=0))
+            context.update(training_by_MLP(training_path, job_name=training_job, feature_d=0))
+        except Exception as e:
+            print e
+            messages.error(request, e)
+        return render(request, 'LogAnalysis/LogAnalysisPage.html', context=context)
+    else:
+        messages.info(request, "analysis error")
+        return render(request, 'LogAnalysis/LogAnalysisPage.html', context=context)
+
+
+def TrainingLogBySVM(request):
+    context = get_training_jobs()
+    if request.method == "POST":
+        training_job = request.POST.get('training_job', "")
+        training_path = Job.objects.get(name=training_job).job_dir
+        print "training_path:", training_path
+        try:
+            context.update(training_by_SVM(training_path, job_name=training_job, feature_d=0))
         except Exception as e:
             print e
             messages.error(request, e)

@@ -14,7 +14,8 @@
     </style>
     <p class="text-left"><strong>Select training method</strong></p>
     <button id="btn_NativeBayes" class="btn btn-primary">NativeBayes</button>
-    <button id="btn_MLP" class="btn btn-primary">MLP&SVM</button>
+    <button id="btn_MLP" class="btn btn-primary">MLP</button>
+    <button id="btn_SVM" class="btn btn-primary">SVM</button>
     <button id="btn_Kmeans" class="btn btn-primary">Kmeans</button>
     {% comment %}<p class="text-center"><strong>Log analysis</strong></p>{% endcomment %}
     <br/><br/>
@@ -38,10 +39,10 @@
         </div>
     </form>
 
-    <form id="MLP" style="display: none" class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:TrainingLogBySVMAndMLP' %}" method="post">
+    <form id="MLP" style="display: none" class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:TrainingLogByMLP' %}" method="post">
         <div class="form-group">
-            <label for="team" class="col-sm-offset-2 col-sm-9">[data] Doc2Vec [model] MLP&SVM</label>
-            <label for="team" class="col-sm-2 control-label">Method MLP&SVM</label>
+            <label for="team" class="col-sm-offset-2 col-sm-9">[data] Doc2Vec [model] MLP</label>
+            <label for="team" class="col-sm-2 control-label">Method MLP</label>
             <div class="col-sm-9">
                 <select class="form-control" name="training_job">
                     {% for job in training_jobs %}
@@ -52,7 +53,26 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-9">
-                <button type="submit" class="btn btn-primary">Training by MLP&SVM</button>
+                <button type="submit" class="btn btn-primary">Training by MLP</button>
+            </div>
+        </div>
+    </form>
+
+    <form id="SVM" style="display: none" class="form-horizontal" role="form" action="{% url 'LogAnalysisPage:TrainingLogBySVM' %}" method="post">
+        <div class="form-group">
+            <label for="team" class="col-sm-offset-2 col-sm-9">[data] Doc2Vec [model] SVM</label>
+            <label for="team" class="col-sm-2 control-label">Method SVM</label>
+            <div class="col-sm-9">
+                <select class="form-control" name="training_job">
+                    {% for job in training_jobs %}
+                        <option id="dir" value="{{job.name}}">{{job.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+                <button type="submit" class="btn btn-primary">Training by SVM</button>
             </div>
         </div>
     </form>
@@ -98,38 +118,45 @@
         </div>
     </form>
 
+    {% if images is not None %}
     {% load staticfiles %}
     <div class="text-center">
+        <h2 class="text-center">Image display</h2>
         {% for img in images %}
             <img src="{% static img %}">
         {% endfor %}
     </div>
+    {% endif %}
 
-    <div id="report">
-        <h2 class="text-center">train report</h2>
-
+    {% if mlp_predicted is not None %}
         <div id="MLP_report">
+            <h2 class="text-center">train report</h2>
             <p>MLP</p>
             <pre>{{ mlp_predicted }}</pre>
             <pre>score = {{ mlp_metrics_score }}</pre>
             <pre>{{ mlp_metrics_report }}</pre>
         </div>
+    {% endif %}
 
+    {% if svm_predicted is not None %}
         <div id="SVM_report">
+            <h2 class="text-center">train report</h2>
             <p>SVM</p>
             <pre>{{ svm_predicted }}</pre>
             <pre>score = {{ svm_metrics_score }}</pre>
             <pre>{{ svm_metrics_report }}</pre>
         </div>
+    {% endif %}
 
+    {% if predicted is not None %}
         <div id="NativeBayes_report">
+            <h2 class="text-center">train report</h2>
             <p>Naive bayes</p>
             <pre>{{ predicted }}</pre>
             <pre>score = {{ metrics_score }}</pre>
             <pre>{{ metrics_report }}</pre>
         </div>
-    </div>
-
+    {% endif %}
 
     <div>
         <table class="table table-striped table-bordered">
@@ -154,19 +181,25 @@
         </table>
     </div>
 
-    {% if messages %}
-        <script>
-            {% for msg in messages %}
-                alert('{{ msg.message }}');
-            {% endfor %}
-        </script>
-    {% endif %}
-
+    <br>
+    <br>
+    <br>
 
     <script>
         $(document).ready(function(){
             $("#btn_MLP").click(function(){
                 $("#MLP").show();
+                $("#SVM").hide();
+                $("#Kmeans").hide();
+                $("#NativeBayes").hide();
+                $("#report").show();
+                $("#MLP_report").show();
+                $("#SVM_report").show();
+                $("#NativeBayes_report").hide();
+            });
+            $("#btn_SVM").click(function(){
+                $("#MLP").hide();
+                $("#SVM").show();
                 $("#Kmeans").hide();
                 $("#NativeBayes").hide();
                 $("#report").show();

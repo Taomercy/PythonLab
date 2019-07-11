@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from common import *
 import os
-from DataProcessingAndPlot.DataPrepare import DocLogs
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout, LSTM
 from keras.layers.convolutional import MaxPooling1D, Conv1D

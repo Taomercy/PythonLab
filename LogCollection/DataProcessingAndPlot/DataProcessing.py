@@ -1,94 +1,41 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from __future__ import division
-from LogAnalysis.models import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from Untils.OsUntils import *
+from Untils.LogFilter import *
 import numpy as np
 
 
-def get_all_files_in_the_dir(dirname):
-    files = []
-    for parent, dirnames, filenames in os.walk(dirname):
-        for filename in filenames:
-            files.append(str(os.path.join(parent, filename)))
-    return files
-
-
-def get_all_dirs_in_the_dir(dirname):
-    dirs = []
-    for parent, dirnames, filenames in os.walk(dirname):
-        for dirname in dirnames:
-            absdirname = str(os.path.join(parent, dirname))
-            try:
-                if os.listdir(absdirname):
-                    dirs.append(absdirname)
-                else:
-                    os.rmdir(absdirname)
-            except Exception as e:
-                print e
-                continue
-    return dirs
-
-
-def get_context_of_files(dirname):
-    context = {}
-    files = get_all_files_in_the_dir(dirname)
-    context['files'] = files
-    return context
-
-
-def get_training_jobs():
-    context = {}
-    context['training_jobs'] = Job.objects.all()
-    return context
-
-
-def get_ml_models():
-    context = {}
-    context['ml_models'] = MLModel.objects.all()
-    return context
-
-
-def get_plotColor():
-    context = {}
-    context['plotColor'] = PlotColor.objects.all()
-    return context
-
-
-def get_plotLineStyle():
-    context = {}
-    context['plotLineStyle'] = PlotLineStyle.objects.all()
-    return context
-
-
-def get_plotMarker():
-    context = {}
-    context['plotMarker'] = PlotMarker.objects.all()
-    return context
-
-
 class DocLogs(object):
-    def __init__(self, dirname):
+    def __init__(self, dirname, processing=True):
         self.dirname = dirname
         self.trainingLogList = get_all_files_in_the_dir(self.dirname)
         self.LogLables = []
         self.model = Doc2Vec()
+        self.processing = processing
 
-    def __iter__(self, class_from_database=True):
+    def __iter__(self):
         TaggededDocument = TaggedDocument
         trainingLogList = self.trainingLogList
         m = len(trainingLogList)
         for i in range(m):
-            logStr = []
             logNameStr = trainingLogList[i]
-            with open(logNameStr, 'r') as cf:
-                lines = cf.readlines()
-            for line in lines:
-                lin = line.split(' ')
-                lin = [li.strip() for li in lin]
-                logStr.extend(lin)
+            logStr = self.GetWordList(logNameStr, processing=self.processing)
             document = TaggededDocument(logStr, tags=[i])
             yield document
+
+    def GetWordList(self, filename, processing=True):
+        context = []
+        if processing:
+            lines = get_filter_log(filename).split('\n')
+        else:
+            lines = get_readlines_log(filename)
+        for line in lines:
+            lin = line.split(' ')
+            lin = [li.strip() for li in lin]
+            context.extend(lin)
+        return context
 
     def GetDocDataSet(self, doc_size=1000):
         trainingLogList = self.trainingLogList
@@ -102,7 +49,7 @@ class DocLogs(object):
             except:
                 continue
 
-        logs = DocLogs(self.dirname)
+        logs = DocLogs(self.dirname, processing=self.processing)
         model = Doc2Vec(logs, dm=1, vector_size=doc_size, workers=4, sample=1e-5)
         model.train(logs, total_examples=model.corpus_count, epochs=model.iter)
         self.model = model

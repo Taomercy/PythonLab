@@ -46,12 +46,14 @@
             <img src="{% static img %}">
             <br>
             {% if images is not None %}
-                <a class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneDay">One day</a>
-                <a class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneWeek">One week</a>
-                <a class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneMonth">One month</a>
-                <a class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=ThreeMonth">Three month</a>
-                <a class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneYear">One year</a>
-                <a class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=All">All</a>
+                <div style="margin-left: 90px">
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneDay">One day</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneWeek">One week</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneMonth">One month</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=ThreeMonth">Three month</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=OneYear">One year</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:ScoresStatisticSubmit' %}?time=All">All</a>
+                </div>
             {% endif %}
         {% endfor %}
     </div>

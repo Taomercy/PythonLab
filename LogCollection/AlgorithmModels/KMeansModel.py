@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from numpy import array
-from DataProcessingAndPlot.DataPrepare import DocLogs
+from common import *
 from sklearn.cluster import KMeans
-from sklearn.externals import joblib
-from DataProcessingAndPlot.DataPrepare import DataPCA
-from DataProcessingAndPlot.DataPlot import visual_2D_dataset
-from LogAnalysis.config import *
-from DataProcessingAndPlot.DataPlot import scatter_plot3d
 from sklearn.cluster import DBSCAN
 
 

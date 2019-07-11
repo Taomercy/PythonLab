@@ -30,12 +30,14 @@
             <img src="{% static img %}">
             <br>
             {% if images is not None %}
-            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneDay">One day</a>
-            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneWeek">One week</a>
-            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneMonth">One month</a>
-            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=ThreeMonth">Three month</a>
-            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneYear">One year</a>
-            <a class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=All">All</a>
+                <div style="margin-left: 50px">
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneDay">One day</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneWeek">One week</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneMonth">One month</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=ThreeMonth">Three month</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=OneYear">One year</a>
+                    <a style="background-color: lightcyan" class="btn active" href="{% url 'LogAnalysisPage:BuildingStatisticSubmit' %}?time=All">All</a>
+                </div>
         {% endif %}
         {% endfor %}
     </div>
