@@ -7,14 +7,15 @@ from email.header import Header
 
 mail_info = {
 	"from":"taomercy@qq.com",
-	"to":"2991778791@qq.com",
+	"to":"1023236042@qq.com",
 	"hostname":"smtp.qq.com",
 	"username":"taomercy@qq.com",
-	"password":"khzzxnxhtbephbej",
+	"password":"******************",
 	"mail_subject":"python mail test",
 	"mail_text":"this is a test mail",
 	"mail_encoding":"utf-8"
 }
+
 
 def send_mail(mail_info):
 	smtp = SMTP_SSL(mail_info["hostname"])
@@ -29,6 +30,7 @@ def send_mail(mail_info):
 
 	smtp.sendmail(mail_info["from"],mail_info["to"],msg.as_string())
 	smtp.quit()
+
 
 if __name__ == '__main__':
 	send_mail(mail_info)
