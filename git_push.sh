@@ -23,10 +23,14 @@ if [[ $confirm  != "yes" ]];then
     exit 2
 fi
 echo "pushed"
-git add -A
-git commit -m "$commit_msg"
 if [[ $git_host == "github.com" ]];then
+    git config user.name taomercy
+    git config user.email taomercy@qq.com
+    git add -A
+    git commit -m "$commit_msg"
     git push
 else
+    git add -A
+    git commit -m "$commit_msg"
     git push origin HEAD:refs/for/$branch
 fi

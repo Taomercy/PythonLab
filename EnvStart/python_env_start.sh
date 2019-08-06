@@ -8,7 +8,7 @@ function pip_install_model(){
     fi
     python -c "import $model_name" 2>/dev/null
     if [ $? != 0 ];then
-        sudo pip install $package_name
+        sudo pip  install $package_name --timeout 100000
     fi
     if [ $? != 0 ];then exit $?;fi
 }
@@ -32,14 +32,15 @@ if [ $? != 0 ];then exit 0; fi
 pip --version  1>/dev/null
 if [ $? != 0 ];then
     sudo apt-get install python-pip python-dev build-essential -y
+    sudo pip install --upgrade pip
     sudo apt-get install libsasl2-dev -y
     sudo apt-get install libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev libldap2-dev -y
     sudo apt-get install uwsgi-uwsgi-plugin-python -y
     sudo apt-get install uwsgi-plugin-python3 -y
-    sudo pip install --upgrade pip
 fi
 if [ $? != 0 ];then exit $?;fi
 
+sudo pip install -r requirements.txt --timeout 100000
 #model common
 pip_install_model pandas
 pip_install_model requests
@@ -69,3 +70,5 @@ pip_install_model xlwt
 
 #model mysql
 pip_install_model MySQLdb MySQL-python
+
+#sudo pip install -r requirements.txt --timeout 100000
