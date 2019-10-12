@@ -1,4 +1,4 @@
-#!user/bin/python
+#!/usr/bin/python
 #-*- conding:UTF-8 -*-
 import xlwt
 

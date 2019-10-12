@@ -110,11 +110,11 @@ def get_info(month):
 
 def send_mail(html):
     mail_info = {
-        "from": "1224355271@qq.com",
-        "to": ["1224355271@qq.com"],
+        "from": "wei.wu@cienet.com.cn",
+        "to": ["wei.wu@cienet.com.cn"],
         "cc": ["1224355271@qq.com", "1224355271@qq.com"],
-        "hostname": "smtp.qq.com",
-        "username": "1224355271@qq.com",
+        "hostname": "smtp.263xmail.com",
+        "username": "wei.wu@cienet.com.cn",
         "password": mail_password,
         "mail_subject": "RE: OT hours in {0}".format(mdict[MONTH]),
         "mail_text": html,

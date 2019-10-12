@@ -25,8 +25,8 @@ class Ball(object):
 	def __init__(self,*args,**kw):
 		#设置球的半径、颜色、移动速度参数
 		self.ball_color = (255,215,0)		
-		self.move_x = 1
-		self.move_y = 1
+		self.move_x = 2
+		self.move_y = 2
 		self.radius = 10
 
 	def ballready(self):
@@ -49,8 +49,8 @@ class Ball(object):
 			self.frequency += 1
 			if self.frequency == 5:
 				self.frequency = 0
-				self.move_x += self.move_x
-				self.move_y += self.move_y
+				self.move_x += int(0.5*self.move_x)
+				self.move_y += int(0.5*self.move_y)
 				self.point += self.point
 		#设置游戏失败条件
 		if self.ball_y > 520:
