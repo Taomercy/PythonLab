@@ -18,10 +18,10 @@ def fnx(n):
 
 
 for i in range(1, 6):
-    print "f{0} = {1}".format(i, fnx(i))
-print '...'
-print "fn = x/(n*x+1)"
+    print("f{0} = {1}".format(i, fnx(i)))
+print('...')
+print("fn = x/(n*x+1)")
 fn = x/(n*x+1)
 Sn = integrate(fn, (x, 0, 1))
-print "Sn =", Sn
-print "lim(n->oo): n*Sn =", limit(n*Sn, n, oo)
+print("Sn =", Sn)
+print("lim(n->oo): n*Sn =", limit(n*Sn, n, oo))

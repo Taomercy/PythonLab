@@ -4,7 +4,6 @@ import os
 
 
 def open_file(filename):
-    contents = []
     with open(filename, 'r') as fo:
         contents = [line.strip('\n').decode('GB2312') for line in fo.readlines()]
     return contents

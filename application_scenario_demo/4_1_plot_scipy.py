@@ -10,7 +10,7 @@ def f(x):
 
 
 # 绘制目标函数的图形
-plt.figure(figsize=(10,5))
+plt.figure(figsize=(10, 5))
 x = np.arange(-10, 10, 0.1)
 plt.xlabel('x')
 plt.ylabel('y')
