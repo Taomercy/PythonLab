@@ -4,9 +4,11 @@ import time
 import poplib
 import email
 from email.header import decode_header
-#========================================
+# ========================================
 # 读取Email，获取Email主题
-#========================================
+# ========================================
+
+
 def getEmailSubject():
     read = poplib.POP3_SSL('pop.qq.com')
     read.user('taomercy@qq.com')# 邮箱用户名
@@ -31,9 +33,11 @@ def getEmailSubject():
     else:
         subjectDecode = subject[0][0]
     return subjectDecode
-#=========================================
+# =========================================
 # 检查Email的主题
-#=========================================
+# =========================================
+
+
 def checkEmailSubject():    
     while True:
         subject = getEmailSubject()   
@@ -46,9 +50,10 @@ def checkEmailSubject():
             os.system('shutdown now')
             break
         if subject == 'check':
-            print 'programma ending...'
+            print('programma ending...')
             break
         time.sleep(10)  # 每10分钟检查一次
+
 
 if __name__ == '__main__':
     checkEmailSubject()

@@ -7,6 +7,7 @@ import sys
 from smtplib import SMTP_SSL
 from email.mime.text import MIMEText
 from email.header import Header
+import getpass
 mdict = {1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr",
          5: "May", 6: "Jun", 7: "Jul", 8: "Aug",
          9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
@@ -15,9 +16,9 @@ br_name = "Wei"
 
 try:
     MONTH = int(sys.argv[1])
-    mail_password = sys.argv[2]
+    mail_password = getpass.getpass("Please input your email password:")
 except Exception as e:
-    print e
+    print(e)
     sys.exit()
 
 
@@ -149,7 +150,7 @@ for value in values:
     mt.add_tr("Wu Wei", "吴威", "ERIC-Shanghai", ot_month=month, ot_day=day, ot_hours=hours, ot_type="Week day")
 mt.add_total_tr(total_time)
 print("toatal:", total_time)
-confirm = raw_input("confirm (yes/no?):")
+confirm = input("confirm (yes/no?):")
 if confirm == 'yes':
     send_mail(mt.get_html())
 else:
