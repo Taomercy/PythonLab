@@ -112,8 +112,6 @@ def get_info(month):
 def send_mail(html):
     mail_info = {
         "from": "wei.wu@cienet.com.cn",
-        # "to": ["costa.shen@ericsson.com"],
-        # "cc": ["huidong@cienet.com.cn", "jiaqianchen@cienet.com.cn"],
         "to": ["wei.wu@cienet.com.cn"],
         "hostname": "pop.263xmail.com",
         "username": "wei.wu@cienet.com.cn",
