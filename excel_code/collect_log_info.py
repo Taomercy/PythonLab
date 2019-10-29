@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
+from __future__ import print_function
 import os
 import sys
 
@@ -8,11 +8,6 @@ import xlrd
 import xlwt
 from xlutils.copy import copy
 
-filename = sys.argv[1]
-try:
-    label = sys.argv[2]
-except:
-    label = None
 xl_name = "log_info.xls"
 data_sheet_name = "log_info"
 label_sheet_name = "log_label"
@@ -38,7 +33,7 @@ def get_data(filename):
     return statistic
 
 
-def collect_log_info():
+def collect_log_info(filename, label=None, training_stat=None):
     if not os.path.exists(xl_name):
         work_book = xlwt.Workbook()
         data_sheet = work_book.add_sheet(data_sheet_name)
@@ -97,12 +92,21 @@ def collect_log_info():
     new_label_sheet.write(new_row, 0, log_name)
     if label:
         new_label_sheet.write(new_row, 1, label)
-        new_label_sheet.write(new_row, 2, True)
+        new_label_sheet.write(new_row, 2, training_stat)
     else:
-        new_label_sheet.write(new_row, 2, False)
+        new_label_sheet.write(new_row, 2, training_stat)
 
     old_content.save(xl_name)
 
 
 if __name__ == '__main__':
-    collect_log_info()
+    train_dir = "C:\\Users\\ZIWWUEX\\Desktop\\code\\log_train"
+    pre_dir = "C:\\Users\ZIWWUEX\Desktop\code\log_predict"
+
+    files = os.listdir(train_dir)
+    for f in files:
+        collect_log_info(os.path.join(train_dir, f), label=1, training_stat=True)
+
+    files = os.listdir(pre_dir)
+    for f in files:
+        collect_log_info(os.path.join(pre_dir, f), label=1, training_stat=False)

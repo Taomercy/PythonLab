@@ -12,8 +12,8 @@ title('title')
 show()
 
 
-subplot(1,2,1)
+subplot(1, 2, 1)
 plot(x, y, 'r^-')
-subplot(1,2,2)
+subplot(1, 2, 2)
 plot(y, x, 'g*-')
 show()
