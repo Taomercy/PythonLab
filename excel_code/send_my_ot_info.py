@@ -98,7 +98,7 @@ def get_delta_time(value):
 
 def get_info(month):
     data = xlrd.open_workbook("201812.xlsx")
-    table = data.sheets()[1]
+    table = data.sheets()[0]
     times = table.col_values(3)
     values = []
     for t in times:
@@ -151,7 +151,7 @@ for value in values:
     total_time += hours
     mt.add_tr("Wu Wei", "吴威", "ERIC-Shanghai", ot_month=month, ot_day=day, ot_hours=hours, ot_type="Week day")
 mt.add_total_tr(total_time)
-print("toatal:", total_time)
+print("total:", total_time)
 confirm = input("confirm (yes/no?):")
 if confirm == 'yes':
     send_mail(mt.get_html())

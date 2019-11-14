@@ -54,8 +54,8 @@ def test():
     dataset_predict_y = gaussianNB.predict(dataset_X)
     correct_predicts = (dataset_predict_y == dataset_Y).sum()
     accuracy = 100 * correct_predicts / dataset_Y.shape[0]
-    print "correct prediction num:", correct_predicts
-    print "accuracy:", accuracy
+    print("correct prediction num:", correct_predicts)
+    print("accuracy:", accuracy)
     plot_classifier(gaussianNB, dataset_X, dataset_Y)
 
 

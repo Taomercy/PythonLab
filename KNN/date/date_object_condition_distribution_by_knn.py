@@ -28,7 +28,7 @@ def file2matrix(filename):
         # 以 '\t' 切割字符串
         listFromLine = line.split()
         # 每列的属性数据
-        print listFromLine
+        print(listFromLine)
         returnMat[index, :] = listFromLine[0:3]
         # 每列的类别数据，就是 label 标签数据
         classLabelVector.append(listFromLine[-1])
@@ -49,8 +49,8 @@ plt.show()
 
 
 size = dataset.shape[0]
-inx = array([3,0,10.8])
-diffMat =  tile(inx, (size, 1)) - dataset
+inx = array([3, 0, 10.8])
+diffMat = tile(inx, (size, 1)) - dataset
 #print diffMat
 distances = ((diffMat ** 2).sum(axis=1)) ** 0.5
 #print distances
@@ -61,6 +61,6 @@ for i in range(k):
     voteLabel = labels[sortedDistIndicies[i]]
     classCount[voteLabel] = classCount.get(voteLabel, 0) + 1
 
-print classCount
+print(classCount)
 sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
-print sortedClassCount[0][0]
+print(sortedClassCount[0][0])

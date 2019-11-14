@@ -24,7 +24,7 @@ print(np.linalg.det(a))
 # 矩阵求逆
 print(np.linalg.inv(a))
 # 矩阵求解
-print ('计算：A^(-1)B：')
+print('计算：A^(-1)B：')
 print(np.linalg.solve(a, b))
 # solve 等价 先逆后内积
 print(np.dot(np.linalg.inv(a), b))

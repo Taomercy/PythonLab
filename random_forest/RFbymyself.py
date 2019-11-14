@@ -171,22 +171,22 @@ def accuracy(predict_values,actual):
         
 if __name__=='__main__':
     seed(1)
-    dataSet=loadCSV('sonar-all-data.csv')
+    dataSet = loadCSV('sonar-all-data.csv')
     column_to_float(dataSet)
-    n_folds=5
-    max_depth=15
-    min_size=1
-    ratio=1.0
+    n_folds = 5
+    max_depth = 15
+    min_size = 1
+    ratio = 1.0
     #n_features=sqrt(len(dataSet)-1)
-    n_features=15
-    n_trees=10
-    folds=spiltDataSet(dataSet,n_folds)
-    scores=[]
+    n_features = 15
+    n_trees = 10
+    folds = spiltDataSet(dataSet, n_folds)
+    scores = []
     for fold in folds:
-        train_set=folds[:]  #此处不能简单地用train_set=folds，这样用属于引用,那么当train_set的值改变的时候，folds的值也会改变，所以要用复制的形式。（L[:]）能够复制序列，D.copy() 能够复制字典，list能够生成拷贝 list(L)
+        train_set = folds[:]  #此处不能简单地用train_set=folds，这样用属于引用,那么当train_set的值改变的时候，folds的值也会改变，所以要用复制的形式。（L[:]）能够复制序列，D.copy() 能够复制字典，list能够生成拷贝 list(L)
         train_set.remove(fold)
         #print len(folds)
-        train_set=sum(train_set,[])  #将多个fold列表组合成一个train_set列表
+        train_set = sum(train_set,[])  #将多个fold列表组合成一个train_set列表
         #print len(train_set)
         test_set=[]
         for row in fold:
@@ -199,9 +199,9 @@ if __name__=='__main__':
         predict_values=random_forest(train_set,test_set,ratio,n_features,max_depth,min_size,n_trees)
         accur=accuracy(predict_values,actual)
         scores.append(accur)
-    print ('Trees is %d'% n_trees)
-    print ('scores:%s'% scores)
-    print ('mean score:%s'% (sum(scores)/float(len(scores))))
+    print('Trees is %d' % n_trees)
+    print('scores:%s' % scores)
+    print('mean score:%s' % (sum(scores)/float(len(scores))))
         
         
         

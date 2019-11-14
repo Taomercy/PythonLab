@@ -242,6 +242,5 @@ baseline_results = model.evaluate(test_features, test_labels,
                                   batch_size=BATCH_SIZE, verbose=0)
 for name, value in zip(model.metrics_names, baseline_results):
     print(name, ': ', value)
-    print()
 
 plot_cm(test_labels, test_predictions_baseline).show()

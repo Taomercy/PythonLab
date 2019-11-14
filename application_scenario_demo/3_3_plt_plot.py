@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#! -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 from pylab import *
 
 x = np.linspace(0, 5, 10)

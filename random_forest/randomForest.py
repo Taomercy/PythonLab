@@ -206,7 +206,7 @@ min_size = 1
 sample_size = 1.0
 #n_features = int(sqrt(len(dataset[0])-1))
 n_features =15  #调参（自己修改） #准确性与多样性之间的权衡
-for n_trees in [1,10,20]:  #理论上树是越多越好
+for n_trees in [1, 10, 20]:  #理论上树是越多越好
     scores = evaluate_algorithm(dataset, random_forest, n_folds, max_depth, min_size, sample_size, n_trees, n_features)
     print('Trees: %d' % n_trees)
     print('Scores: %s' % scores)

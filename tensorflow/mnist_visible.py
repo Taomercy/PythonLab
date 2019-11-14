@@ -7,6 +7,7 @@ import tensorflow.examples.tutorials.mnist.input_data as input_data
 from PIL import Image
 import matplotlib.pyplot as plt
 
+
 def main():
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
     batch_xs, batch_ys = mnist.train.next_batch(1)
@@ -16,15 +17,8 @@ def main():
     plt.axis('on')
     plt.title('image')
     plt.show()
-    print batch_ys
-    print mnist.label
-
-
-
-
-
-
-
+    print(batch_ys)
+    print(mnist.label)
 
 
 if __name__ == '__main__':
