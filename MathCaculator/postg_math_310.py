@@ -25,3 +25,4 @@ fn = x/(n*x+1)
 Sn = integrate(fn, (x, 0, 1))
 print("Sn =", Sn)
 print("lim(n->oo): n*Sn =", limit(n*Sn, n, oo))
+
