@@ -32,8 +32,8 @@ choice = {
     6: "吃鸡",
 }
 size = len(choice)
-prob = [0.3, 0.11, 0.14, 0.15, 0.18, 0.12]
-
+prob = [0.3, 0.15, 0.15, 0.14, 0.13, 0.13]
+# print(sum(prob))
 # total = []
 # print(prob)
 # for i in range(10000):
