@@ -15,9 +15,9 @@ except:
 def debug_func(tag, data=None):
 	if debug_flag == 'on':
 		if data != None:
-			print '{0}'.format(tag), data
+			print('{0}'.format(tag), data)
 		else:
-			print '{0}'.format(tag)
+			print('{0}'.format(tag))
 
 #使字典显示中文
 def json_print(data):
@@ -146,7 +146,7 @@ def create_decision_tree(dataset, labels):
 def main1():
 	dataset, labels = create_dataset()
 	entropy = calculate_entropy(dataset)
-	print '总熵:',entropy
+	print('总熵:',entropy)
 #理解特征分类过程
 def main2():
 	dataset, labels = create_dataset()
@@ -155,8 +155,8 @@ def main2():
 def main():
 	dataset, labels = create_dataset()
 	decision_tree = create_decision_tree(dataset, labels) 
-	print '决策树：'
-	print json_print(decision_tree)
+	print('决策树：')
+	print(json_print(decision_tree))
 	
 
 if __name__ == '__main__':
