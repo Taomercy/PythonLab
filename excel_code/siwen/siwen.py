@@ -1,5 +1,20 @@
+# -*- coding:utf-8 -*-
 from openpyxl import load_workbook
 import xlrd
+
+
+def set_person_info(context, sheet, line):
+    if not context:
+        return
+    person_list = context.split('-')
+    sheet.cell(line, 1).value = person_list[0]
+    sheet.cell(line, 2).value = person_list[1]
+    sheet.cell(line, 3).value = person_list[2]
+    sheet.cell(line, 4).value = person_list[3]
+    sheet.cell(line, 5).value = person_list[4]
+    sheet.cell(line, 7).value = person_list[5]
+    sheet.cell(line, 8).value = person_list[6]
+
 
 info_workbook = xlrd.open_workbook("information.xlsx")
 info_sheet = info_workbook.sheet_by_index(0)
@@ -64,5 +79,11 @@ for number in range(1, nrows):
         template_sheet.cell(17, 6).value = "√"
     else:
         template_sheet.cell(17, 8).value = "√"
+
+    set_person_info(context[15], template_sheet, 22)
+    set_person_info(context[16], template_sheet, 24)
+    set_person_info(context[17], template_sheet, 26)
+    set_person_info(context[18], template_sheet, 28)
+    set_person_info(context[19], template_sheet, 30)
 
     template_workbook.save('{}.xlsx'.format("".join(address_string)))
