@@ -20,6 +20,10 @@ def set_person_info(context, sheet, number):
 
 def generate_excel(information):
     info_workbook = xlrd.open_workbook(information)
+    name = os.path.basename(information)
+    dirname = name.split('.')[0]
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
     info_sheet = info_workbook.sheet_by_index(0)
     nrows = info_sheet.nrows
     for number in range(1, nrows):
@@ -30,7 +34,7 @@ def generate_excel(information):
             print(context)
             address = context[5]
             if address in addresses:
-                obj_file = os.path.join("tables", '{}.xlsx'.format(address))
+                obj_file = os.path.join(dirname, '{}.xlsx'.format(address))
                 workbook = load_workbook(obj_file)
                 sheet = workbook['Sheet1']
                 no = None
@@ -46,20 +50,21 @@ def generate_excel(information):
             else:
                 addresses.append(address)
 
+            # 房屋室号
             template_sheet.cell(3, 3).value = address
+            # 姓名
+            template_sheet.cell(4, 4).value = context[0]
+            # 身份证号
+            template_sheet.cell(4, 6).value = "身份证:  {}".format(context[1])
+            # 居住地
+            template_sheet.cell(8, 4).value = context[5]
+
             set_person_info(context, template_sheet, 1)
-            file_pth = os.path.join("tables", '{}.xlsx'.format(address))
+
+            file_pth = os.path.join(dirname, '{}.xlsx'.format(address))
             template_workbook.save(file_pth)
 
 
-
-        # # 房屋室号
-        # address_string = context[2].split('-')
-        # template_sheet.cell(3, 3).value = address_string[0]
-        # template_sheet.cell(3, 5).value = address_string[1]
-        # template_sheet.cell(3, 6).value = address_string[2]
-        # template_sheet.cell(3, 7).value = address_string[3]
-        #
         # # 姓名
         # template_sheet.cell(4, 4).value = context[3]
         # # 身份证号
@@ -117,6 +122,3 @@ for file in excel_files:
     path = os.path.join("20201016", file)
     print(path, "=============>")
     generate_excel(path)
-
-
-print("共计excel：", len(os.listdir("tables")))
