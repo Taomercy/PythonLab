@@ -107,6 +107,12 @@ def main(mp4):
                     if type(angle) is int:
                         print("\r夹角:", angle, end="", flush=True)
                 except:
+                    sheet.cell(INDEX, 1).value = 'detect%d.jpg' % INDEX
+                    sheet.cell(INDEX, 1).alignment = align
+                    sheet.cell(INDEX, 2).value = "None"
+                    sheet.cell(INDEX, 2).alignment = align
+                    sheet.cell(INDEX, 3).value = "未检测到直线"
+                    sheet.cell(INDEX, 3).alignment = align
                     continue
         else:
             break
