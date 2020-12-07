@@ -12,8 +12,14 @@ global INDEX
 INDEX = 0
 #统计概率霍夫线变换
 def line_detect_possible_demo(image):
+    global INDEX
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     edges = cv2.Canny(gray, 300, 550, apertureSize=3)  # apertureSize参数默认其实就是3
+    edges_image = 'edges%d.jpg' % INDEX
+    if not os.path.exists("edges"):
+        os.mkdir("edges")
+    edges_image = os.path.join("edges", edges_image)
+    cv2.imwrite(edges_image, edges)
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 60, minLineLength=60, maxLineGap=5)
     result_lines = []
     points = []
@@ -25,7 +31,6 @@ def line_detect_possible_demo(image):
         # print("coordinate:", x1, y1, x2, y2)
         points.append([x1, y1, x2, y2])
         cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
-    global INDEX
     fileName = 'detect%d.jpg' % INDEX
     if not os.path.exists("detect"):
         os.mkdir("detect")
@@ -97,7 +102,7 @@ def main(mp4):
             if i % 3 == 0:
                 global INDEX
                 INDEX += 1
-                fileName = 'image' + str(INDEX) + '.jpg'
+                fileName = 'catch' + str(INDEX) + '.jpg'
                 if not os.path.exists("catch"):
                     os.mkdir("catch")
                 fileName = os.path.join("catch", fileName)

@@ -13,13 +13,14 @@ def create_gif(image_list, gif_name, duration=1.0):
     return
 
 
-def main():
-    store_path = "detect"
+def generate(dirname):
+    store_path = dirname
     image_list = [os.path.join(store_path, image)for image in os.listdir(store_path)]
-    gif_name = 'detect.gif'
+    gif_name = dirname + ".gif"
     duration = 0.3
     create_gif(image_list, gif_name, duration)
 
 
 if __name__ == '__main__':
-    main()
+    generate("detect")
+    generate("edges")
