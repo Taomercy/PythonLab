@@ -5,7 +5,7 @@ import os
 import imageio
 
 
-def create_gif(image_list, gif_name, duration=1):
+def create_gif(image_list, gif_name, duration=1.0):
     frames = []
     for image_name in image_list:
         frames.append(imageio.imread(image_name))
