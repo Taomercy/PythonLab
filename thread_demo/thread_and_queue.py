@@ -18,10 +18,11 @@ def product(name):
 
 
 def consume(name):
+    time.sleep(3)
     while True:
-        time.sleep(3)
         if not q.empty():
             print('{}使用了{}'.format(name, q.get()))
+            time.sleep(3)
             q.task_done()
         else:
             print("{} end.".format(name))
