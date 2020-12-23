@@ -18,7 +18,7 @@ def funcA():
     start = time.time()
     threads = []
     threadID = 1
-    for i in range(10):
+    for i in range(1000):
         threadLock = threading.Lock()
         ip = "1.1.1.%d" % i
         thread = Thread(target=collection_ip, args=(database, ip, threadLock))
@@ -26,7 +26,8 @@ def funcA():
         threads.append(thread)
         threadID += 1
     # for t in threads:
-    #     t.join()
+    #     if t.is_alive():
+    #         t.join()
 
     print("span:", time.time() - start)
 
