@@ -1,9 +1,10 @@
 import queue
 import socket
+import sys
 import threading
 import time
 from queue import Queue
-
+rtc = None
 
 class RemoteControl(threading.Thread):
     def __init__(self, rtc_data, udp_port=9999):
@@ -47,7 +48,7 @@ class RemoteControl(threading.Thread):
     def start_udp_server(self):
         print("udp server start")
         self.__udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__udp_socket.settimeout(5.0)
+        self.__udp_socket.settimeout(3.0)
         self.__udp_socket.bind(('0.0.0.0', self.__udp_port))
         self.__running = True
 
@@ -61,6 +62,9 @@ class RemoteControl(threading.Thread):
             self.__udp_socket = None
             self.__running = False
 
+    def send_msg(self, context, client):
+        self.__udp_socket.sendto(context.encode("utf-8"), client)
+
     def read_udp_cmd(self):
         try:
             data, client = self.__udp_socket.recvfrom(4096)
@@ -70,26 +74,26 @@ class RemoteControl(threading.Thread):
         except socket.timeout:
             return
 
-        data = data.strip()
-        print("receive data:", data.decode("utf-8"))
+        data = data.strip().decode("utf-8")
+        print("receive data:", data)
         try:
             cmd = data.split()[0]
             print("cmd:", cmd)
         except IndexError:
             answer = 'HSS_rtc command NOT VALID'
-            sent = self.__udp_socket.sendto(answer, client)
+            self.send_msg(answer, client)
             return
 
         if cmd == "who_are_you":
             answer = 'HSS_rtc'
-            sent = self.__udp_socket.sendto(answer, client)
-        elif cmd == 'quit':
-            answer = 'ORDERED'
-            sent = self.__udp_socket.sendto(answer, client)
-            rtc.paused = False
+            self.send_msg(answer, client)
+        elif cmd == 'stop_server':
+            answer = 'STOPED'
+            self.send_msg(answer, client)
             self.rtc_data.exit_rtc = True
+            rtc.set_exit()
         else:
-            sent = self.__udp_socket.sendto("Done", client)
+            return
 
     def run(self):
         print("read_udp_cmd is running")
@@ -124,11 +128,14 @@ class RTCData(object):
 class RTCController(object):
     def __init__(self, rtc_data):
         self.__rtc_data = rtc_data
-        self.__paused = False
+        self.__exit = False
 
     @property
     def rtc_data(self):
         return self.__rtc_data
+
+    def set_exit(self):
+        self.__exit = True
 
     def release(self):
         self.rtc_data.remote_control.shutdown()
@@ -138,12 +145,14 @@ class RTCController(object):
         self.rtc_data.start_remote_control()
         print('RTC execution start')
         while True:
-            while self.__paused:
-                print('RTC in paused state')
+            if self.__exit:
+                print('RTC will close after 5s')
                 time.sleep(5.0)
+                self.rtc_data.exit_rtc = True
+                break
 
             try:
-                send_data = input("==>")
+                send_data = input("rtc_server> ")
                 print(send_data)
             except KeyboardInterrupt:
                 self.rtc_data.exit_rtc = True
