@@ -1,4 +1,6 @@
 import cmd
+import os
+import platform
 import socket
 import sys
 import threading
@@ -6,7 +8,7 @@ import time
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.settimeout(3.0)
-address = ('100.98.218.151', 9999)
+address = ('127.0.0.1', 9999)
 server_socket.connect(address)
 
 recv_running = False
@@ -77,6 +79,18 @@ class RTCShell(cmd.Cmd):
 
     def do_who_are_you(self, arg):
         self.send_msg("who_are_you")
+
+    def do_add(self, arg):
+        print(sum([int(i) for i in arg.split(" ")]))
+
+    def do_clear(self, arg):
+        system_version = platform.system()
+        if system_version == "Windows":
+            os.system("cls")
+        elif system_version == "Linux":
+            os.system("clear")
+        else:
+            print("cannot recognise system:", system_version)
 
 
 if __name__ == '__main__':
