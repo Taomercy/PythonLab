@@ -5,7 +5,7 @@ import threading
 import time
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.settimeout(2.0)
+#server_socket.settimeout(10.0)
 address = ('127.0.0.1', 9999)
 server_socket.connect(address)
 
@@ -24,7 +24,7 @@ def recv_msg():
             msg, addr = server_socket.recvfrom(1024)
         except socket.timeout:
             continue
-        print("receive from server:", msg.decode('utf-8'))
+        print(msg.decode('utf-8'), flush=True)
 
 
 class RTCShell(cmd.Cmd):
@@ -67,13 +67,12 @@ class RTCShell(cmd.Cmd):
             print(e)
 
     def do_hello(self, arg):
-        print('hello', arg)
+        self.send_msg('hello')
 
     def do_send(self, arg):
         self.send_msg(arg)
 
     def do_stop_server(self, arg):
-        print("send")
         self.send_msg("stop_server")
 
     def do_who_are_you(self, arg):

@@ -5,6 +5,8 @@ import threading
 import time
 from queue import Queue
 rtc = None
+hello_count = 0
+
 
 class RemoteControl(threading.Thread):
     def __init__(self, rtc_data, udp_port=9999):
@@ -63,7 +65,11 @@ class RemoteControl(threading.Thread):
             self.__running = False
 
     def send_msg(self, context, client):
-        self.__udp_socket.sendto(context.encode("utf-8"), client)
+        #print(context)
+        try:
+            self.__udp_socket.sendto(context.encode("utf-8"), client)
+        except Exception as e:
+            print(e)
 
     def read_udp_cmd(self):
         try:
@@ -75,7 +81,6 @@ class RemoteControl(threading.Thread):
             return
 
         data = data.strip().decode("utf-8")
-        print("receive data:", data)
         try:
             cmd = data.split()[0]
             print("cmd:", cmd)
@@ -85,13 +90,21 @@ class RemoteControl(threading.Thread):
             return
 
         if cmd == "who_are_you":
-            answer = 'HSS_rtc'
+            answer = 'HSS RTC'
             self.send_msg(answer, client)
         elif cmd == 'stop_server':
             answer = 'STOPED'
             self.send_msg(answer, client)
             self.rtc_data.exit_rtc = True
             rtc.set_exit()
+        elif cmd == 'hello':
+            global hello_count
+            hello_count += 1
+            answer = 'Hello Commander! ({}/5)'.format(hello_count)
+            if hello_count == 5:
+                hello_count = 0
+                answer += "\nMission accomplished"
+            self.send_msg(answer, client)
         else:
             return
 
