@@ -51,7 +51,7 @@ class RemoteControl(threading.Thread):
         print("udp server start")
         self.__udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__udp_socket.settimeout(3.0)
-        self.__udp_socket.bind(('0.0.0.0', self.__udp_port))
+        self.__udp_socket.bind(('100.98.218.151', self.__udp_port))
         self.__running = True
 
     def shutdown(self):

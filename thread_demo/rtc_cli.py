@@ -5,8 +5,8 @@ import threading
 import time
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#server_socket.settimeout(10.0)
-address = ('127.0.0.1', 9999)
+server_socket.settimeout(3.0)
+address = ('100.98.218.151', 9999)
 server_socket.connect(address)
 
 recv_running = False
@@ -51,7 +51,7 @@ class RTCShell(cmd.Cmd):
         self.do_exit(line)
 
     def do_exit(self, line):
-        self.stop()
+        # self.stop()
         global recv_running
         recv_running = False
         sys.exit(0)
