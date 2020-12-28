@@ -26,7 +26,7 @@ def recv_msg():
             msg, addr = server_socket.recvfrom(1024)
         except socket.timeout:
             continue
-        print(msg.decode('utf-8'), flush=True)
+        print("message from server:", msg.decode('utf-8'), flush=True)
 
 
 class RTCShell(cmd.Cmd):

@@ -65,7 +65,6 @@ class RemoteControl(threading.Thread):
             self.__running = False
 
     def send_msg(self, context, client):
-        #print(context)
         try:
             self.__udp_socket.sendto(context.encode("utf-8"), client)
         except Exception as e:
@@ -88,7 +87,6 @@ class RemoteControl(threading.Thread):
             answer = 'HSS_rtc command NOT VALID'
             self.send_msg(answer, client)
             return
-
         if cmd == "who_are_you":
             answer = 'HSS RTC'
             self.send_msg(answer, client)
@@ -106,7 +104,7 @@ class RemoteControl(threading.Thread):
                 answer += "\nMission accomplished"
             self.send_msg(answer, client)
         else:
-            return
+            pass
 
     def run(self):
         print("read_udp_cmd is running")
@@ -158,15 +156,12 @@ class RTCController(object):
         self.rtc_data.start_remote_control()
         print('RTC execution start')
         while True:
-            if self.__exit:
-                print('RTC will close after 5s')
-                time.sleep(5.0)
-                self.rtc_data.exit_rtc = True
-                break
-
             try:
-                send_data = input("rtc_server> ")
-                print(send_data)
+                if self.__exit:
+                    print('RTC will close after 5s')
+                    self.rtc_data.exit_rtc = True
+                    time.sleep(5.0)
+                    break
             except KeyboardInterrupt:
                 self.rtc_data.exit_rtc = True
                 break
