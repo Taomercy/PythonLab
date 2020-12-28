@@ -156,12 +156,14 @@ class RTCController(object):
         self.rtc_data.start_remote_control()
         print('RTC execution start')
         while True:
+            if self.__exit:
+                print('RTC will close after 5s')
+                self.rtc_data.exit_rtc = True
+                time.sleep(5.0)
+                break
             try:
-                if self.__exit:
-                    print('RTC will close after 5s')
-                    self.rtc_data.exit_rtc = True
-                    time.sleep(5.0)
-                    break
+                cmd = input("rtc_server>")
+                print(cmd)
             except KeyboardInterrupt:
                 self.rtc_data.exit_rtc = True
                 break

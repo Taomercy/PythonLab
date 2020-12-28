@@ -3,30 +3,11 @@ import os
 import platform
 import socket
 import sys
-import threading
-import time
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.settimeout(3.0)
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_socket.settimeout(3.0)
 address = ('127.0.0.1', 9999)
-server_socket.connect(address)
-
-recv_running = False
-
-
-def recv_msg():
-    global recv_running
-    recv_running = True
-    print("receive start")
-    while True:
-        if recv_running is False:
-            server_socket.close()
-            return
-        try:
-            msg, addr = server_socket.recvfrom(1024)
-        except socket.timeout:
-            continue
-        print("message from server:", msg.decode('utf-8'), flush=True)
+udp_socket.connect(address)
 
 
 class RTCShell(cmd.Cmd):
@@ -54,8 +35,6 @@ class RTCShell(cmd.Cmd):
 
     def do_exit(self, line):
         # self.stop()
-        global recv_running
-        recv_running = False
         sys.exit(0)
 
     def stop(self):
@@ -64,7 +43,16 @@ class RTCShell(cmd.Cmd):
 
     def send_msg(self, context):
         try:
-            server_socket.sendto(context.encode('utf-8'), address)
+            udp_socket.sendto(context.encode('utf-8'), address)
+        except Exception as e:
+            print(e)
+        self.receive_msg()
+
+    @staticmethod
+    def receive_msg():
+        try:
+            msg, addr = udp_socket.recvfrom(1024)
+            print("message from server:", msg.decode('utf-8'))
         except Exception as e:
             print(e)
 
@@ -94,20 +82,14 @@ class RTCShell(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    thread_recv = threading.Thread(target=recv_msg)
-    thread_recv.start()
-
     shell = RTCShell(stdin=sys.stdin)
     try:
         shell.cmdloop()
     except KeyboardInterrupt as e:
-        recv_running = False
-        thread_recv.join()
-        server_socket.close()
+        udp_socket.close()
         shell.stop()
         sys.exit()
     except:
-        thread_recv.join()
-        server_socket.close()
+        udp_socket.close()
         sys.exit()
 
