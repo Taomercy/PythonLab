@@ -52,7 +52,7 @@ class RTCShell(cmd.Cmd):
     def receive_msg():
         try:
             msg, addr = udp_socket.recvfrom(1024)
-            print("message from server:", msg.decode('utf-8'))
+            print(msg.decode('utf-8'))
         except Exception as e:
             print(e)
 

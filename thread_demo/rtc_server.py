@@ -10,7 +10,7 @@ hello_count = 0
 
 class RemoteControl(threading.Thread):
     def __init__(self, rtc_data, udp_port=9999):
-        threading.Thread.__init__(self)
+        super().__init__()
         self.__id = "REMOTE_CONTROL"
         self.__rtc_data = rtc_data
 
