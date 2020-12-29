@@ -8,11 +8,11 @@ q = queue.Queue(maxsize=3)
 def product(name):
     count = 1
     while True:
-        q.put('气球兵{}'.format(count))
-        print('{}训练气球兵{}只'.format(name, count))
+        q.put('cake {}'.format(count))
+        print('{} create cake {}'.format(name, count))
         count += 1
         time.sleep(1)
-        if count > 5:
+        if count > 7:
             print("{} end.".format(name))
             break
 
@@ -21,8 +21,8 @@ def consume(name):
     time.sleep(3)
     while True:
         if not q.empty():
-            print('{}使用了{}'.format(name, q.get()))
-            time.sleep(3)
+            print('{} eat {}'.format(name, q.get()))
+            time.sleep(5)
             q.task_done()
         else:
             print("{} end.".format(name))

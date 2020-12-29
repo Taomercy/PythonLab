@@ -8,7 +8,7 @@ BUFSIZ = 1024
 ADDRESS = (HOST, PORT)
 
 udpServerSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udpServerSocket.settimeout(10.0)
+udpServerSocket.settimeout(30.0)
 udpServerSocket.bind(ADDRESS)      # 绑定客户端口和地址
 
 
