@@ -6,8 +6,6 @@ from concurrent import futures
 from concurrent.futures.thread import ThreadPoolExecutor
 from multiprocessing import cpu_count
 
-from IPython.utils import contexts
-
 workers = (cpu_count() or 1) * 5
 
 
