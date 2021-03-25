@@ -50,7 +50,7 @@ pylint==1.9.3
 pyparsing==2.2.0
 python-dateutil==2.7.3
 pytz==2018.5
-PyYAML==3.13
+PyYAML==5.4
 requests==2.20.0
 Rest-Framework-Auth-Toolkit==0.9
 s3transfer==0.2.0
