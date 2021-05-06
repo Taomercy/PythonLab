@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-\
-import xlrd
+from openpyxl import load_workbook
 import datetime
 import time
 import sys
@@ -8,15 +8,16 @@ from smtplib import SMTP_SSL
 from email.mime.text import MIMEText
 from email.header import Header
 import getpass
+
+br_name = "Wei"
+MONTH = datetime.datetime.now().month
 mdict = {1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr",
          5: "May", 6: "Jun", 7: "Jul", 8: "Aug",
          9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
 
-br_name = "Wei"
 
 try:
-    MONTH = int(sys.argv[1])
-    mail_password =  getpass.getpass("Please input your email password:")
+    mail_password = getpass.getpass("Please input your email password:")
 except Exception as e:
     print(e)
     sys.exit()
@@ -37,13 +38,13 @@ class MailTable(object):
                     <td width=97 nowrap valign=bottom style='width:73.0pt;border:solid windowtext 1.0pt;border-left:none;background:#17375D;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'><p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:white'>OT Month<o:p></o:p></span></b></p></td>
                     <td width=81 nowrap valign=bottom style='width:61.0pt;border:solid windowtext 1.0pt;border-left:none;background:#17375D;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'><p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:white'>OT Day<o:p></o:p></span></b></p></td>
                     <td width=80 nowrap valign=bottom style='width:60.0pt;border:solid windowtext 1.0pt;border-left:none;background:#17375D;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'><p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:white'>OT hours<o:p></o:p></span></b></p></td>
-                    <td width=85 nowrap valign=bottom style='width:64.0pt;border:solid windowtext 1.0pt;border-left:none;background:#17375D;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'><p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:white'>OT Type<o:p></o:p></span></b></p></td>
+                    <td width=85 nowrap valign=bottom style='width:64.0pt;border:solid windowtext 1.0pt;border-left:none;background:#17375D;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'><p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:white'>Event<o:p></o:p></span></b></p></td>
         """
         self.html = "<p>Hi,</p><p>My OT info in {0}：</p>".format(mdict[MONTH])
         self.html += self.table_head
         self.html += self.td_head
 
-    def add_tr(self, spell_name, chinese_name, pcode, ot_month, ot_day, ot_hours, ot_type):
+    def add_tr(self, spell_name, chinese_name, pcode, ot_month, ot_day, ot_hours, event):
         td = """
                     <td width=64 nowrap style='width:48.0pt;border:solid windowtext 1.0pt;border-top:none;background:white;padding:0in 5.4pt 0in 5.4pt;height:15.65pt'><p class=MsoNormal><span style='color:black'>60712<o:p></o:p></span></p></td>
                     <td width=96 nowrap style='width:1.0in;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;background:white;padding:0in 5.4pt 0in 5.4pt;height:15.65pt'><p class=MsoNormal><span style='font-size:10.0pt;font-family:"Times New Roman",serif'>{0}<o:p></o:p></span></p></td>
@@ -53,7 +54,7 @@ class MailTable(object):
                     <td width=81 nowrap valign=bottom style='width:61.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:15.65pt'><p class=MsoNormal><span style='font-size:10.0pt;font-family:"Times New Roman",serif'>{4}<o:p></o:p></span></p></td>
                     <td width=80 nowrap valign=bottom style='width:60.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:15.65pt'><p class=MsoNormal><span style='font-size:10.0pt;font-family:"Times New Roman",serif'>{5}<o:p></o:p></span></p></td>
                     <td width=85 nowrap valign=bottom style='width:64.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;background:#FCD5B4;padding:0in 5.4pt 0in 5.4pt;height:15.65pt'><p class=MsoNormal><span style='color:black'>{6}</span></p></td>
-        """.format(spell_name, chinese_name, pcode, ot_month, ot_day, ot_hours, ot_type)
+        """.format(spell_name, chinese_name, pcode, ot_month, ot_day, ot_hours, event)
         tr = "<tr style='height:15.0pt'>" + td + "</tr>"
         self.html += tr
 
@@ -78,8 +79,8 @@ class MailTable(object):
 
 
 def get_delta_time(value):
-    date = value.split(' ')[0]
-    timedelta = value.split(' ')[1]
+    date = value.split('  ')[0]
+    timedelta = value.split('  ')[1]
     timestart = timedelta.split('-')[0]
     timeend = timedelta.split('-')[1]
     ts = date + ' ' + timestart
@@ -96,24 +97,25 @@ def get_delta_time(value):
     return date, delta
 
 
-def get_info(month):
-    data = xlrd.open_workbook("201812.xlsx")
-    table = data.sheets()[1]
-    times = table.col_values(3)
-    values = []
-    for t in times:
-        unit = t.split('\n')
-        for u in unit:
-            if u.startswith(str(month)):
-                values.append(u)
-    return values
+def get_info():
+    data = load_workbook("ot.xlsx")
+    table = data['Sheet1']
+    rows = table.max_row
+    row_data = []
+    events = []
+    for i in range(2, rows + 1):
+        cell_value = table.cell(row=i, column=1).value
+        if cell_value.startswith(str(MONTH)):
+            row_data.append(cell_value.strip())
+            events.append(table.cell(row=i, column=2).value)
+    return row_data, events
 
 
 def send_mail(html):
     mail_info = {
         "from": "wei.wu@cienet.com.cn",
         "to": ["wei.wu@cienet.com.cn"],
-        "cc": ["1224355271@qq.com", "1224355271@qq.com"],
+        "cc": ["1224355271@qq.com"],
         "hostname": "smtp.263xmail.com",
         "username": "wei.wu@cienet.com.cn",
         "password": mail_password,
@@ -138,9 +140,9 @@ def send_mail(html):
 
 
 mt = MailTable()
-values = get_info(MONTH)
+values, events = get_info()
 total_time = 0
-for value in values:
+for value, event in zip(values, events):
     date, delta = get_delta_time(value)
     print(date, delta.seconds/60.0/60.0)
     dlist = date.split('/')
@@ -148,7 +150,7 @@ for value in values:
     day = dlist[1]
     hours = delta.seconds/60.0/60.0
     total_time += hours
-    mt.add_tr("Wei", "威", "Shanghai", ot_month=month, ot_day=day, ot_hours=hours, ot_type="Week day")
+    mt.add_tr("Wei", "吴威", "ERIC-Shanghai-HSS", ot_month=month, ot_day=day, ot_hours=hours, event=event)
 mt.add_total_tr(total_time)
 send_mail(mt.get_html())
 
