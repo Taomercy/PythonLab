@@ -11,6 +11,7 @@ import getpass
 
 br_name = "Wei"
 MONTH = datetime.datetime.now().month
+YEAR = datetime.datetime.now().year
 mdict = {1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr",
          5: "May", 6: "Jun", 7: "Jul", 8: "Aug",
          9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
@@ -105,7 +106,8 @@ def get_info():
     events = []
     for i in range(2, rows + 1):
         cell_value = table.cell(row=i, column=1).value
-        if cell_value.startswith(str(MONTH)):
+        date = cell_value.split('  ')[0]
+        if date.startswith(str(MONTH)) and date.endswith(str(YEAR)):
             row_data.append(cell_value.strip())
             events.append(table.cell(row=i, column=2).value)
     return row_data, events
@@ -152,5 +154,5 @@ for value, event in zip(values, events):
     total_time += hours
     mt.add_tr("Wei", "吴威", "ERIC-Shanghai-HSS", ot_month=month, ot_day=day, ot_hours=hours, event=event)
 mt.add_total_tr(total_time)
-send_mail(mt.get_html())
+#send_mail(mt.get_html())
 
