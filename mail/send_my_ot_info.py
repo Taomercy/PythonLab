@@ -154,5 +154,5 @@ for value, event in zip(values, events):
     total_time += hours
     mt.add_tr("Wei", "吴威", "ERIC-Shanghai-HSS", ot_month=month, ot_day=day, ot_hours=hours, event=event)
 mt.add_total_tr(total_time)
-#send_mail(mt.get_html())
+send_mail(mt.get_html())
 
