@@ -19,10 +19,13 @@ def no_name(string_a, string_b):
 
 # solver 2
 def my_solver(string_a, string_b):
-    a, b = list(string_a), list(string_b)
-    a.sort()
-    b.sort()
-    return True if "".join(a) == "".join(b) else False
+    if type(string_a) is str and type(string_b) is str:
+        a, b = list(string_a), list(string_b)
+        a.sort()
+        b.sort()
+        return a == b
+    else:
+        raise TypeError
 
 
 # a = "light123"
