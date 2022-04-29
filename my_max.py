@@ -39,9 +39,11 @@ def my_max(*iterable, key=lambda x: x, default=None):
 
 a = [1, 3, 2, 5]
 b = [3, 2, 3, 1, "6"]
-c = [[1, 2], (1, 3)]
+c = [[1, 2], (1, 3), (3, 1)]
 
 
 print(max(a))
 print(my_max(b, key=int))
 print(my_max(c, key=lambda x: x[1]))
+
+print(sorted(c, key=lambda x: x[1], reverse=True))
