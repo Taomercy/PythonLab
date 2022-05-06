@@ -47,5 +47,32 @@ for slave_row in range(2, sheet_ts_slave.max_row+1):
         sheet_slaves_count.cell(1, count_column).value = s
         sheet_slaves_count.cell(count_row, count_column).value = c
 
+sum_max_row = None
+sum_max_column = None
+
+for i in range(2, sheet_slaves_count.max_row+2):
+    if sheet_slaves_count.cell(i, 1).value is None:
+        data = sheet_slaves_count.cell(i-1, 1)
+        sum_max_row = data.row
+        break
+
+for i in range(2, sheet_slaves_count.max_column+2):
+    if sheet_slaves_count.cell(1, i).value is None:
+        data = sheet_slaves_count.cell(1, i-1)
+        sum_max_column = data.column
+        break
+
+data = sheet_slaves_count.cell(sum_max_row, sum_max_column)
+max_column = data.coordinate.replace(str(data.row), "")
+
+for i in range(2, data.row):
+    formula = "=SUM(B{0}:{1}{0})".format(i, max_column)
+    sheet_slaves_count.cell(i, int(data.column)+1, value=formula)
+
+for i in range(2, data.column+1):
+    d = sheet_slaves_count.cell(sum_max_row, i)
+    column = d.coordinate.replace(str(d.row), "")
+    formula = "=SUM({0}2:{0}{1})".format(column, sum_max_row)
+    sheet_slaves_count.cell(sum_max_row+1, i, value=formula)
 
 workbook.save(work_book_name)
