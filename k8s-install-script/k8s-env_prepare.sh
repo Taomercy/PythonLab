@@ -27,6 +27,10 @@ service crond restart
 # install basic package
 yum install -y yum-utils device-mapper-persistent-data lvm2 wget net-tools nfs-utils lrzsz gcc gcc-c++ make cmake libxml2-devel openssl-devel curl curl-devel unzip sudo ntp libaio-devel wget vim ncurses-devel autoconf automake zlib-devel  python-devel epel-release openssh-server socat  ipvsadm conntrack ntpdate telnet ipvsadm
 
+# swap off
+swapoff -a
+ID=`sed -n '/swap/=' /etc/fstab`
+sed -i $ID's/^/#&/g' /etc/fstab
 
 # install iptables
 yum install iptables-services -y
