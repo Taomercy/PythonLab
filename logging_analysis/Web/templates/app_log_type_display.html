@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <title>App Log Type</title>
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+
+                <!-- /.card -->
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AppLog Type</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="families_table" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                {% for th in thread %}
+                                    <th>{{ th }}</th>
+                                {% endfor %}
+                                <th>Operation</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for app in applogs %}
+                                <tr>
+                                    <td>{{ app.name }}</td>
+                                    <td>{{ app.release_version }}</td>
+                                    <td>{{ app.count }}</td>
+                                    <td>{{ app.create_at }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'delete_app_type' %}">
+                                            <input type="hidden" name="applog_type_name" value="{{ app.name }}">
+                                            <input type="submit" value="Delete" class="btn btn-sm btn-danger">
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <form method="get" action="{% url 'create_applog_type' %}" style="float:left">
+                            <input type="submit" value="Create AppLog Type" class="btn btn-sm btn-info">
+                        </form>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.content -->
+{% endblock %}
+
+
+{% block script %}
+    <!-- DataTables -->
+    <script src="{% static 'adminlte/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+    <!-- page script -->
+
+    <script>
+        $(function () {
+            $('#families_table').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+{% endblock %}

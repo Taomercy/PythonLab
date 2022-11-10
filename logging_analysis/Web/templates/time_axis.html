@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    {% if request.method == "GET" %}
+        <form action="{% url 'time_axis' %}" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Chose Parameters</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                        data-toggle="tooltip" title="Collapse">
+                                    <i class="fas fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if cases %}
+                                <div class="form-group">
+                                    <label for="inputName">Uploaded tars</label>
+                                    <select name="case_tar" class="form-control custom-select">
+                                        {% for case in cases %}
+                                            <option>{{ case }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning">There is no case tar now, please upload first.</div>
+                            {% endif %}
+
+                            <div class="form-group">
+                                <label for="inputName">Start Time</label>
+                                <input name="start" type="text" id="inputName" class="form-control"
+                                       placeholder="2020-10-11 01:39:04">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputName">End Time</label>
+                                <input name="end" type="text" id="inputName" class="form-control"
+                                       placeholder="2020-10-11 14:57:13">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="submit" value="Build" class="btn btn-success float-right">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if request.method == "POST" %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Time Axis</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                                    title="Collapse">
+                                <i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="container" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}
+{% block script %}
+
+    <script src="{% static 'adminlte/dist/js/pages/dashboard.js' %}"></script>
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var chart = {
+                zoomType: 'x',
+            };
+            var title = {
+                text: 'Time Axis'
+            };
+            var subtitle = {};
+            var xAxis = {
+                type: 'date',
+            };
+            var yAxis = {
+                title: {
+                    text: 'Exchange Rate'
+                }
+            };
+            var legend = {
+                align: 'left',
+                verticalAlign: "top",
+                layout: "vertical",
+                x: 60,
+                floating: true,
+                borderWidth: 1,
+            };
+            var plotOptions = {
+                colors: ["#FF1493", "#8A2BE2", "#0A2BE2"],
+                area: {
+                    fillColor: {
+                        linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    lineWidth: 1,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null,
+                }
+            };
+            var series = [
+                {% for name, loads in loads_data.items %}
+                    {
+                        name: "{{ name }}",
+                        data: {{ loads }},
+                        lineWidth: 3,
+                        type: "area"
+                    },
+                {% endfor %}
+
+                {% for name, error_rate in error_rate_data.items %}
+                    {
+                        name: "{{ name }}",
+                        data: {{ error_rate }}
+                    },
+                {% endfor %}
+            ];
+
+            var json = {};
+            json.chart = chart;
+            json.title = title;
+            json.subtitle = subtitle;
+            json.legend = legend;
+            json.xAxis = xAxis;
+            json.yAxis = yAxis;
+            json.series = series;
+            json.plotOptions = plotOptions;
+            $('#container').highcharts(json);
+
+        });
+    </script>
+{% endblock %}

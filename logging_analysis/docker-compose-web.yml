@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+    web:
+        build:
+            context: .
+            dockerfile: ./build/web/Dockerfile
+        image: "hwwuex_check_web"
+        ports:
+        - "8080:8080"
+        volumes:
+        - /home/Web
+        - /hcs:/hcs
+        environment:
+        - PYTHONPATH=:/home
+        command: python3 /home/Web/manage.py runserver 0.0.0.0:8080
+        container_name: "hc_web"

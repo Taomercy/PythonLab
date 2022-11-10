@@ -1,0 +1,17 @@
+version: "3"
+services:
+    db:
+        image: mysql
+        network_mode: "bridge"
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_DATABASE=hc_db
+            - MYSQL_ROOT_PASSWORD=admin123
+        volumes:
+            - /var/lib:/var/lib
+            - /var/lib/mysql:/var/lib/mysql
+            - /etc/mysql:/etc/mysql
+        command: --default-authentication-plugin=mysql_native_password
+        container_name: "hc_db"
+

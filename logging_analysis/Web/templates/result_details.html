@@ -1,0 +1,669 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+{% endblock %}
+{% block content %}
+    <div style="text-align: center"><h3>{{ properties.case_name }}</h3></div>
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Properties</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                                title="Collapse">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="display: none">
+                    <table>
+                        {% for k, v in properties.items %}
+                            <tr>
+                                <th>{{ k }}</th>
+                                <td>{{ v }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% if memory_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if memory_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif memory_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Free Memory Result: {{ memory_result }}</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if memory_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+    {% if compare_data %}
+        {% if memory_result == "FAILED" %}
+            <div class="card-body">
+        {% else %}
+            <div class="card-body" style="display: none">
+        {% endif %}
+    <table id="memory_compare" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>VM</th>
+            {% for th in memory_tr %}
+                <th>{{ th }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for cluster, values in compare_data.items %}
+            <tr>
+                <td style="color:blue">{{ cluster }}</td>
+            </tr>
+            {% for value in values %}
+                <tr>
+                    <td></td>
+                    <td>{{ value.memory }}</td>
+                    <td>{{ value.pre }}</td>
+                    <td>{{ value.post }}</td>
+                    <td>{{ value.rate }}</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% endif %}
+    {% if memory_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    <div>
+        {% for pic in memory_pictures %}
+            <img src="{% static pic %}" style="width:100%; height: 100%">
+        {% endfor %}
+    </div>
+    <div>
+        {% for cluster, data in memory_data.items %}
+            <div class="card-body">
+                <table id="cluster_free_memory" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th style="color:blue">{{ cluster }}</th>
+                        {% for th in memory_th %}
+                            <th>{{ th }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for dict in data %}
+                        <tr>
+                            {% for name in dict.keys %}
+                                <td>{{ name }}</td>
+                            {% endfor %}
+                            {% for num in dict.PRE %}
+                                <td>{{ num }}</td>
+                            {% endfor %}
+                            {% for num in dict.POST %}
+                                <td>{{ num }}</td>
+                            {% endfor %}
+                            {% for num in dict.delta %}
+                                <td>{{ num }}</td>
+                            {% endfor %}
+                            {% for num in dict.rate %}
+                                <td>{{ num }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if applog_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if applog_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif applog_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Applog Result: {{ applog_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if applog_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if applog_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+
+    {% if load_time_output %}
+        {% for line in load_time_output %}
+            <div><h2>{{ line }}</h2></div>
+        {% endfor %}
+    {% else %}
+        <div><p>Start from: {{ start }}</p></div>
+        <div><p>End from: {{ end }}</p></div>
+    {% endif %}
+
+    <div>
+        {% if applog_data %}
+            {% for app_name, data in applog_data.items %}
+                <div class="card-body">
+                    <p style="color:blue">{{ app_name }}</p>
+                    <table id="cluster_free_memory" class="table table-bordered table-striped" align="center">
+                        <thead>
+                        <tr>
+                            {% for th in applog_th %}
+                                <th>{{ th }}</th>
+                            {% endfor %}
+                            <th>Note</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for info in data %}
+                            <tr>
+                                <td>{{ info.name }}</td>
+                                <td>{{ info.count }}</td>
+                                {% if info.status == "new" %}
+                                    <td style="color:blue">{{ info.status }}</td>
+                                {% else %}
+                                    <td>{{ info.status }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                {% for line in applog_log %}
+                    <p>{{ line }}</p>
+                {% endfor %}
+            </div>
+
+        {% endif %}
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if load_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if load_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif load_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Load Result: {{ load_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if load_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if load_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% if loads %}
+        <div class="tab-content p-0">
+            <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 400px">
+                <div id="load_plot" style="height: 400px;"></div>
+            </div>
+        </div>
+    {% endif %}
+    {% if load_log %}
+        <div>
+            <h style="color:red">load log:</h>
+            {% for line in load_log %}
+                <p>{{ line }}</p>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div>
+            <p>No load log</p>
+        </div>
+    {% endif %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if process_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if process_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif process_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Process Result: {{ process_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if process_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if process_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    <p>Process Tolerance Value: {{ process_tolerance }}</p>
+    <table id="process_table" class="table table-bordered">
+        <thead>
+        <tr>
+            {% for th in process_th %}
+                <th>{{ th }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for data in process_datatable %}
+            {% if data.deviation > process_tolerance or data.deviation < process_negative_tolerance %}
+                <tr bgcolor="orange">
+                    {% else %}
+                <tr>
+            {% endif %}
+        <td>{{ data.process_name }}</td>
+        <td>{{ data.process_id }}</td>
+        <td>{{ data.post }}</td>
+        <td>{{ data.pre }}</td>
+        <td>{{ data.deviation }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% for line in process_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if extdb_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if extdb_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif extdb_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Extdb Result: {{ extdb_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if extdb_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if extdb_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% for line in extdb_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if fmalarm_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if fmalarm_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif fmalarm_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Fmalarm Result: {{ fmalarm_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if fmalarm_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if fmalarm_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% for line in fmalarm_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if health_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if health_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif health_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Health Result: {{ health_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if health_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if health_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% for line in health_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if http_connection_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if http_connection_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif http_connection_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Http Connection Result: {{ http_connection_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if http_connection_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if http_connection_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% for line in http_connection_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if traffic_error_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if traffic_error_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif traffic_error_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Traffic Error Result: {{ traffic_error_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if traffic_error_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if traffic_error_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% for line in traffic_error_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+    {% if ca_result %}
+        <div class="row">
+        <div class="col-md-12">
+        {% if ca_result == "FAILED" %}
+            <div class="card card-primary card-red">
+        {% elif ca_result == "EXCEPTION" %}
+            <div class="card card-primary card-orange">
+        {% else %}
+            <div class="card card-primary card-green">
+        {% endif %}
+    <div class="card-header">
+        <h3 class="card-title">Ca Result: {{ ca_result }}</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                    title="Collapse">
+                {% if ca_result == "FAILED" %}
+                    <i class="fas fa-minus"></i></button>
+                {% else %}
+                    <i class="fas fa-plus"></i></button>
+                {% endif %}
+        </div>
+    </div>
+
+    {% if ca_result == "FAILED" %}
+        <div class="card-body">
+    {% else %}
+        <div class="card-body" style="display: none">
+    {% endif %}
+    {% for line in ca_log %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+{% endblock %}
+{% block script %}
+    <script src="{% static 'adminlte/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'adminlte/dist/js/pages/dashboard.js' %}"></script>
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var chart = {
+                type: 'areaspline'
+            };
+            var title = {
+                text: 'Load Rate'
+            };
+            var subtitle = {
+                style: {
+                    position: 'absolute',
+                    right: '0px',
+                    bottom: '10px'
+                }
+            };
+            var legend = {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 60,
+                y: 20,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+            };
+            var xAxis = {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    millisecond: '%H:%M:%S.%L',
+                    second: '%H:%M:%S',
+                    minute: '%H:%M',
+                    hour: '%H:%M',
+                    day: '%m-%d',
+                    week: '%m-%d',
+                    month: '%Y-%m',
+                    year: '%Y'
+                }
+            };
+            var yAxis = {
+                title: {
+                    text: 'Precent'
+                }
+
+            };
+            var tooltip = {
+                shared: true,
+                valueSuffix: ' units'
+            };
+            var credits = {
+                enabled: false
+            };
+            var plotOptions = {
+                areaspline: {
+                    fillOpacity: 0.5
+                }
+            };
+            var series = [{
+                data:{{ loads }}
+            }
+            ];
+
+            var json = {};
+            json.chart = chart;
+            json.title = title;
+            json.subtitle = subtitle;
+            json.xAxis = xAxis;
+            json.yAxis = yAxis;
+            json.legend = legend;
+            json.plotOptions = plotOptions;
+            json.credits = credits;
+            json.series = series;
+            $('#load_plot').highcharts(json);
+        });
+
+        $(function () {
+            $('#process_table').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+{% endblock %}

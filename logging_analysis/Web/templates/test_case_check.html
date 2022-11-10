@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!-- Main content -->
+{% block content %}
+    {% if request.method == "GET" %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Chose Parameters</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                                    title="Collapse">
+                                <i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if danger %}
+                            <div class="alert alert-danger">{{ danger }}</div>
+                        {% endif %}
+                        {% if warning %}
+                            <div class="alert alert-warning">{{ warning }}</div>
+                        {% endif %}
+                        {% if info %}
+                            <div class="alert alert-info">{{ info }}</div>
+                        {% endif %}
+                        {% if cases %}
+                            <div class="form-group">
+                                <label for="inputName">Case Path</label>
+                                <select id="case_path" class="form-control custom-select">
+                                    {% for case in cases %}
+                                        <option>{{ case }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">There is no case tar now, please upload first.</div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="inputName">Type</label>
+                            <select id="type" class="form-control custom-select">
+                                <option>stability</option>
+                                <option>robustness</option>
+                                <option>accuracy</option>
+                                <option>upgrade</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputName">Property</label>
+                            <select id="property" class="form-control custom-select">
+                                {% for property in properties %}
+                                    <option>{{ property.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputName">Start Time</label>
+                            <input id="start" type="text" class="form-control" placeholder="2020-10-11 01:39:04">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputName">End Time</label>
+                            <input id="end" type="text" class="form-control" placeholder="2020-10-11 14:57:13">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputName">Mode</label>
+                            <select id="mode" class="form-control custom-select" multiple="multiple">
+                                <option>all</option>
+                                <option>load</option>
+                                <option>memory</option>
+                                <option>applog</option>
+                                <option>alarm</option>
+                                <option>traffic</option>
+                                <option>ca</option>
+                                <option>health check</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="submit" value="Build" class="btn btn-success float-right"
+                                       onclick="hwwuex_check()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block script %}
+    <script src="{% static 'adminlte/dist/js/pages/dashboard.js' %}"></script>
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script language="JavaScript">
+        function hwwuex_check() {
+            alert("checking");
+            var case_path = $("#case_path option:checked").text();
+            var type = $("#type option:checked").text();
+            var start = $("#type").val();
+            var end = $("#type").val();
+            var mode = $("#mode option:checked").text();
+
+            $.post("/test_case_check", {
+                "case_path": case_path,
+                "type": type,
+                "start": start,
+                "end": end,
+                "mode": mode
+            }, function (data) {
+                var result = JSON.parse(data);
+                var user = result.user;
+                var timestamp = result.timestamp;
+                window.location.replace("/result_details?user=" + user + "&timestamp=" + timestamp);
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,4 @@
+name: default
+free_memory_rate: 0.3
+rosetta_url: https://rosetta.com/api/environments/121
+rosetta_token: 123dfgafqrg24

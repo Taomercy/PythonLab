@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <title>Dashboard</title>
+{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center">Total count: {{ total }} (in {{ days }} days)</h2><br>
+    {% if record_data %}
+        <div class="tab-content p-0">
+            <div class="chart tab-pane active" id="checking-chart" style="position: relative; height: 400px">
+                <div id="checking_plot" style="height: 400px;"></div>
+            </div>
+        </div>
+    {% endif %}
+    <br>
+    <div id="users_count" class="col-6" style="float:left"></div>
+    <div id="types_count" class="col-6" style="float:right"></div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/highcharts.js' %}"></script>
+    <script>
+        Highcharts.chart('users_count', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Users Count in {{days}} days'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: 'Count',
+                colorByPoint: true,
+                data: [
+                    {% for user, y in users_count.items %}
+                        {
+                            name: '{{ user }}',
+                            y: {{ y }}
+                        },
+                    {% endfor %}
+                ]
+            }]
+        });
+        Highcharts.chart('types_count', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Types Count in {{days}} days'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: 'Count',
+                colorByPoint: true,
+                data: [
+                    {% for type, y in types_count.items %}
+                        {
+                            name: '{{ type }}',
+                            y: {{ y }}
+                        },
+                    {% endfor %}
+                ]
+            }]
+        });
+
+        var chart = {
+            type: 'areaspline'
+        };
+        var title = {
+            text: 'Checking statistic'
+        };
+        var subtitle = {
+            style: {
+                position: 'absolute',
+                right: '0px',
+                bottom: '10px'
+            }
+        };
+        var legend = {
+            layout: 'vertical',
+            align: 'left',
+            verticalAlign: 'top',
+            x: 60,
+            y: 20,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        };
+        var xAxis = {
+            categories: [{% for x in x_data %}'{{ x }}', {% endfor %}]
+        };
+        var yAxis = {
+            title: {
+                text: 'Count/Month'
+            }
+        };
+        var tooltip = {
+            shared: true,
+            valueSuffix: ' units'
+        };
+        var credits = {
+            enabled: false
+        };
+        var plotOptions = {
+            areaspline: {
+                fillOpacity: 0.5
+            }
+        };
+        var series = [
+            {% for type, data in record_data.items %}
+                {
+                    name: "{{ type }}",
+                    data: [{% for label, value in data.items %}['{{ label }}', {{ value }}],{% endfor %}]
+                },
+            {% endfor %}
+        ];
+
+        var json = {};
+        json.chart = chart;
+        json.title = title;
+        json.subtitle = subtitle;
+        json.xAxis = xAxis;
+        json.yAxis = yAxis;
+        json.legend = legend;
+        json.plotOptions = plotOptions;
+        json.credits = credits;
+        json.series = series;
+        $('#checking_plot').highcharts(json);
+    </script>
+{% endblock %}

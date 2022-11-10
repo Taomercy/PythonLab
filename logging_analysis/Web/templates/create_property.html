@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!-- Main content -->
+{% block content %}
+    <form action="{% url 'create_unstability_property' %}" method="post">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Create Unstability Property</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                                    title="Collapse">
+                                <i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="col-sm-12">Name</label>
+                            <input type="text" name="property_name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-12">Free Memory Delta rate</label>
+                            <input type="text" name="free_memory_delta_rate" class="form-control" value="0.3">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{% url 'app_log_type_display' %}" class="btn btn-secondary">Cancel</a>
+                                <input type="submit" value="Submit" class="btn btn-success float-right">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </form>
+{% endblock %}
